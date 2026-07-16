@@ -13,7 +13,7 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
-export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+export function MobileMenu({ onClose }: MobileMenuProps) {
   const pathname = usePathname();
 
   const linkVariants = {
@@ -92,7 +92,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         transition={{ delay: 0.5, duration: 0.4 }}
         className="pb-10 pt-4 mt-auto"
       >
-        <Button className="w-full text-lg py-4">Book Transfer</Button>
+        <Button href="/billing" onClick={onClose} className="w-full text-lg py-4">
+          Book Transfer
+        </Button>
       </motion.div>
     </motion.div>
   );

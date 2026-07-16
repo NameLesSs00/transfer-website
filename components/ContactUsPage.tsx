@@ -49,7 +49,7 @@ export function ContactUsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            We're here to help! Reach out to us for inquiries, booking assistance, or any questions about your transfer.
+            We&apos;re here to help! Reach out to us for inquiries, booking assistance, or any questions about your transfer.
           </motion.p>
         </div>
       </section>
@@ -126,7 +126,7 @@ export function ContactUsPage() {
           <div className="flex flex-col gap-3">
             <h2 className="text-3xl font-bold text-transfer-green">Send Us a Message</h2>
             <p className="text-transfer-gray text-base leading-relaxed">
-              Have a question or need more information about our products? Fill out the form below and we'll get back to you as soon as possible.
+              Have a question or need more information about our products? Fill out the form below and we&apos;ll get back to you as soon as possible.
             </p>
           </div>
 

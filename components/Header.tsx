@@ -73,7 +73,7 @@ export function Header() {
             <ChevronDown className="w-4 h-4 text-transfer-dark group-hover:text-transfer-green transition-colors" />
           </div>
           
-          <Button>Book Transfer</Button>
+          <Button href="/billing">Book Transfer</Button>
         </div>
 
         {/* Mobile Hamburger Menu */}

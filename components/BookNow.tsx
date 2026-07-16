@@ -2,11 +2,14 @@
 
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 export function BookNow() {
+  const router = useRouter();
+
   const handleBookNow = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push("/billing");
   };
 
   return (

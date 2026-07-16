@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { History, UserCheck, Ban, Tag } from "lucide-react";
+import { History, Ban } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function WhyChooseUs() {

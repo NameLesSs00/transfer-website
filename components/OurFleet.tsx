@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Users, Briefcase, Wind, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
@@ -174,9 +175,9 @@ export function OurFleet() {
                 </div>
 
                 {/* Book Now Button */}
-                <button className="w-full bg-transfer-green text-white font-bold text-base py-4 rounded-full hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 shadow-md hover:shadow-lg mt-2">
+                <Link href="/billing" className="w-full bg-transfer-green text-white font-bold text-base py-4 rounded-full hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 shadow-md hover:shadow-lg mt-2 text-center">
                   Book Now
-                </button>
+                </Link>
 
               </div>
             </motion.div>

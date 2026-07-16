@@ -91,7 +91,7 @@ export function AboutUsPage() {
               <div className="w-24 h-[4px] bg-[#ddf0d6] rounded-full" />
             </div>
             <p className="text-base md:text-lg text-transfer-gray leading-relaxed">
-              We are dedicated to providing safe, reliable, and comfortable airport transfer services across the Red Sea region. Whether you're arriving for a relaxing vacation or heading back to the airport, our goal is to make every journey smooth and stress-free.
+              We are dedicated to providing safe, reliable, and comfortable airport transfer services across the Red Sea region. Whether you&apos;re arriving for a relaxing vacation or heading back to the airport, our goal is to make every journey smooth and stress-free.
             </p>
             <p className="text-base md:text-lg text-transfer-gray leading-relaxed">
               With years of experience in transportation and hospitality, we understand the importance of punctuality, comfort, and exceptional customer service. Our professional drivers and modern fleet ensure that every trip is enjoyable from start to finish.
@@ -270,7 +270,7 @@ export function AboutUsPage() {
           </div>
 
           <div className="relative z-20 flex-shrink-0">
-            <Button className="px-5 py-4 md:px-8 md:py-6 text-sm md:text-lg">
+            <Button href="/billing" className="px-5 py-4 md:px-8 md:py-6 text-sm md:text-lg">
               Book Transfer
             </Button>
           </div>
