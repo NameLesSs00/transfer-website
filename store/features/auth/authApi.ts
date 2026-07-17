@@ -4,6 +4,7 @@ import { AuthSession, LoginRequest, UpdatePasswordPayload } from "./authModels";
 const ACCESS_TOKEN_KEY = "transfer_admin_access_token";
 const REFRESH_TOKEN_KEY = "transfer_admin_refresh_token";
 const ADMIN_PROFILE_KEY = "transfer_admin_profile";
+const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -20,6 +21,8 @@ export function getStoredAuthSession(): AuthSession | null {
 
   try {
     const profile = JSON.parse(rawProfile) as Pick<AuthSession, "email" | "fullName">;
+    syncAccessTokenCookie(accessToken);
+
     return {
       accessToken,
       refreshToken,
@@ -40,6 +43,7 @@ export function storeAuthSession(session: AuthSession) {
     ADMIN_PROFILE_KEY,
     JSON.stringify({ email: session.email, fullName: session.fullName })
   );
+  syncAccessTokenCookie(session.accessToken);
 }
 
 export function clearStoredAuthSession() {
@@ -48,6 +52,19 @@ export function clearStoredAuthSession() {
   window.localStorage.removeItem(ACCESS_TOKEN_KEY);
   window.localStorage.removeItem(REFRESH_TOKEN_KEY);
   window.localStorage.removeItem(ADMIN_PROFILE_KEY);
+  clearAccessTokenCookie();
+}
+
+function syncAccessTokenCookie(accessToken: string) {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+
+  document.cookie = `${ACCESS_TOKEN_KEY}=${encodeURIComponent(
+    accessToken
+  )}; Path=/; Max-Age=${AUTH_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
+}
+
+function clearAccessTokenCookie() {
+  document.cookie = `${ACCESS_TOKEN_KEY}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
 
 export async function loginRequest(payload: LoginRequest) {

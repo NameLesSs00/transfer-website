@@ -1,50 +1,159 @@
 "use client";
 
-import { LogOut, Menu, Plus, RefreshCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { fetchAdmins, openAddAdminModal } from "@/store/features/admins/adminsSlice";
+import { LogOut, Menu, Plus } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { openAddAdminModal } from "@/store/features/admins/adminsSlice";
 import { logoutAdmin } from "@/store/features/auth/authSlice";
+import { openCreateLocationJourneyModal } from "@/store/features/locationJourneys/locationJourneysSlice";
+import { openCreateLocationModal } from "@/store/features/locations/locationsSlice";
+import { openCreateRoutePricingModal } from "@/store/features/routePricings/routePricingsSlice";
+import { openCreateTransferRouteModal } from "@/store/features/transferRoutes/transferRoutesSlice";
 import { openAdminSidebar } from "@/store/features/ui/uiSlice";
-import {
-  fetchVehicleFactories,
-  openCreateVehicleFactoryModal,
-} from "@/store/features/vehicleFactories/vehicleFactoriesSlice";
+import { openCreateVehicleCategoryModal } from "@/store/features/vehicleCategories/vehicleCategoriesSlice";
+import { openCreateVehicleFactoryModal } from "@/store/features/vehicleFactories/vehicleFactoriesSlice";
+import { openCreateVehicleModal } from "@/store/features/vehicles/vehiclesSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+
+type AdminPageAction =
+  | "addAdmin"
+  | "addCategory"
+  | "addFactory"
+  | "addJourney"
+  | "addLocation"
+  | "addRoutePricing"
+  | "addTransferRoute"
+  | "addVehicle";
+
+function getPageConfig(pathname: string): {
+  action?: AdminPageAction;
+  addLabel?: string;
+  eyebrow: string;
+  title: string;
+} {
+  if (pathname.startsWith("/admin/admins")) {
+    return {
+      action: "addAdmin",
+      addLabel: "Add Admin",
+      eyebrow: "Access Management",
+      title: "Admins",
+    };
+  }
+
+  if (pathname.startsWith("/admin/vehicle-factories")) {
+    return {
+      action: "addFactory",
+      addLabel: "Add Factory",
+      eyebrow: "Fleet Configuration",
+      title: "Vehicle Factories",
+    };
+  }
+
+  if (pathname.startsWith("/admin/vehicles")) {
+    return {
+      action: "addVehicle",
+      addLabel: "Add Vehicle",
+      eyebrow: "Fleet Management",
+      title: "Vehicles",
+    };
+  }
+
+  if (pathname.startsWith("/admin/vehicle-categories")) {
+    return {
+      action: "addCategory",
+      addLabel: "Add Category",
+      eyebrow: "Fleet Configuration",
+      title: "Vehicle Categories",
+    };
+  }
+
+  if (pathname.startsWith("/admin/location-journeys")) {
+    return {
+      action: "addJourney",
+      addLabel: "Add Journey",
+      eyebrow: "Route Configuration",
+      title: "Location Journeys",
+    };
+  }
+
+  if (pathname.startsWith("/admin/transfer-routes")) {
+    return {
+      action: "addTransferRoute",
+      addLabel: "Add Route",
+      eyebrow: "Route Configuration",
+      title: "Transfer Routes",
+    };
+  }
+
+  if (pathname.startsWith("/admin/route-pricings")) {
+    return {
+      action: "addRoutePricing",
+      addLabel: "Add Pricing",
+      eyebrow: "Pricing Configuration",
+      title: "Route Pricings",
+    };
+  }
+
+  if (pathname.startsWith("/admin/locations")) {
+    return {
+      action: "addLocation",
+      addLabel: "Add Location",
+      eyebrow: "Route Configuration",
+      title: "Locations",
+    };
+  }
+
+  return {
+    eyebrow: "Admin Dashboard",
+    title: "Dashboard",
+  };
+}
 
 export function AdminTopbar() {
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
   const router = useRouter();
-  const activeSection = useAppSelector((state) => state.ui.activeAdminSection);
-  const admins = useAppSelector((state) => state.admins);
-  const vehicleFactories = useAppSelector((state) => state.vehicleFactories);
   const logoutStatus = useAppSelector((state) => state.auth.logoutStatus);
-  const isVehicleFactories = activeSection === "vehicleFactories";
-  const title = isVehicleFactories ? "Vehicle Factories" : "Admins";
-
-  function handleRefresh() {
-    if (isVehicleFactories) {
-      dispatch(
-        fetchVehicleFactories({
-          pageNumber: vehicleFactories.pageNumber,
-          pageSize: vehicleFactories.pageSize,
-          search: vehicleFactories.search,
-          sortBy: vehicleFactories.sortBy,
-          isDescending: vehicleFactories.isDescending,
-        })
-      );
-      return;
-    }
-
-    dispatch(fetchAdmins({ pageNumber: admins.pageNumber, pageSize: admins.pageSize }));
-  }
+  const page = getPageConfig(pathname);
 
   function handleAdd() {
-    if (isVehicleFactories) {
+    if (page.action === "addFactory") {
       dispatch(openCreateVehicleFactoryModal());
       return;
     }
 
-    dispatch(openAddAdminModal());
+    if (page.action === "addAdmin") {
+      dispatch(openAddAdminModal());
+      return;
+    }
+
+    if (page.action === "addJourney") {
+      dispatch(openCreateLocationJourneyModal());
+      return;
+    }
+
+    if (page.action === "addLocation") {
+      dispatch(openCreateLocationModal());
+      return;
+    }
+
+    if (page.action === "addTransferRoute") {
+      dispatch(openCreateTransferRouteModal());
+      return;
+    }
+
+    if (page.action === "addRoutePricing") {
+      dispatch(openCreateRoutePricingModal());
+      return;
+    }
+
+    if (page.action === "addCategory") {
+      dispatch(openCreateVehicleCategoryModal());
+      return;
+    }
+
+    if (page.action === "addVehicle") {
+      dispatch(openCreateVehicleModal());
+    }
   }
 
   async function handleLogout() {
@@ -64,29 +173,24 @@ export function AdminTopbar() {
         </button>
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-transfer-green">
-            Admin Dashboard
+            {page.eyebrow}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-transfer-dark md:text-3xl">
-            {title}
+            {page.title}
           </h1>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          onClick={handleRefresh}
-          className="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-bold text-transfer-dark hover:bg-gray-50"
-        >
-          <RefreshCcw className="h-4 w-4" />
-          Refresh
-        </button>
-        <button
-          onClick={handleAdd}
-          className="inline-flex h-10 items-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525]"
-        >
-          <Plus className="h-4 w-4" />
-          {isVehicleFactories ? "Add Factory" : "Add Admin"}
-        </button>
+        {page.action && (
+          <button
+            onClick={handleAdd}
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525]"
+          >
+            <Plus className="h-4 w-4" />
+            {page.addLabel}
+          </button>
+        )}
         <button
           onClick={handleLogout}
           disabled={logoutStatus === "loading"}

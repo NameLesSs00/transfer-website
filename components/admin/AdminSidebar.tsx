@@ -1,22 +1,64 @@
 "use client";
 
 import Image from "next/image";
-import { Factory, Users, X } from "lucide-react";
+import Link from "next/link";
+import { BadgeDollarSign, CarFront, Factory, LayoutDashboard, MapPin, MapPinned, Route, Tags, Users, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  closeAdminSidebar,
-  setActiveAdminSection,
-} from "@/store/features/ui/uiSlice";
+import { closeAdminSidebar } from "@/store/features/ui/uiSlice";
+
+const navigationItems = [
+  {
+    href: "/admin/dashboard",
+    icon: LayoutDashboard,
+    label: "Dashboard",
+  },
+  {
+    href: "/admin/admins",
+    icon: Users,
+    label: "Admins",
+  },
+  {
+    href: "/admin/vehicles",
+    icon: CarFront,
+    label: "Vehicles",
+  },
+  {
+    href: "/admin/vehicle-factories",
+    icon: Factory,
+    label: "Vehicle Factories",
+  },
+  {
+    href: "/admin/vehicle-categories",
+    icon: Tags,
+    label: "Vehicle Categories",
+  },
+  {
+    href: "/admin/locations",
+    icon: MapPin,
+    label: "Locations",
+  },
+  {
+    href: "/admin/transfer-routes",
+    icon: Route,
+    label: "Transfer Routes",
+  },
+  {
+    href: "/admin/route-pricings",
+    icon: BadgeDollarSign,
+    label: "Route Pricings",
+  },
+  {
+    href: "/admin/location-journeys",
+    icon: MapPinned,
+    label: "Location Journeys",
+  },
+];
 
 function SidebarContent() {
   const dispatch = useAppDispatch();
-  const activeSection = useAppSelector((state) => state.ui.activeAdminSection);
+  const pathname = usePathname();
   const profile = useAppSelector((state) => state.auth.profile);
-
-  function activateSection(section: "admins" | "vehicleFactories") {
-    dispatch(setActiveAdminSection(section));
-    dispatch(closeAdminSidebar());
-  }
 
   const activeClass = "bg-[#edf8f1] text-transfer-green";
   const inactiveClass = "text-[#667085] hover:bg-gray-50";
@@ -33,24 +75,25 @@ function SidebarContent() {
       />
 
       <nav className="mt-10 flex flex-col gap-2">
-        <button
-          onClick={() => activateSection("admins")}
-          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold ${
-            activeSection === "admins" ? activeClass : inactiveClass
-          }`}
-        >
-          <Users className="h-5 w-5" />
-          Admins
-        </button>
-        <button
-          onClick={() => activateSection("vehicleFactories")}
-          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold ${
-            activeSection === "vehicleFactories" ? activeClass : inactiveClass
-          }`}
-        >
-          <Factory className="h-5 w-5" />
-          Vehicle Factories
-        </button>
+        {navigationItems.map((item) => {
+          const Icon = item.icon;
+          const isActive =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => dispatch(closeAdminSidebar())}
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold ${
+                isActive ? activeClass : inactiveClass
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="mt-auto rounded-xl bg-[#f6f8fb] p-4">
