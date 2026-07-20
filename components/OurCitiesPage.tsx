@@ -21,8 +21,9 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchPerJourneys } from "@/store/features/perJourneys/perJourneysSlice";
 import { hydrateAuth } from "@/store/features/auth/authSlice";
 import { buildVehicleImageUrl } from "@/components/admin/vehicles/vehicleDisplay";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { setSelectedJourney, calculatePrice } from "@/store/features/bookings/bookingSlice";
+import { Suspense } from "react";
 
 /* ─── Data ─────────────────────────────────────────────────────────── */
 const cities = [
@@ -53,7 +54,7 @@ const cities = [
 ];
 
 /* ─── Component ─────────────────────────────────────────────────────── */
-export function OurCitiesPage() {
+function OurCitiesContent() {
   const [selectedCity, setSelectedCity] = useState<typeof cities[0] | null>(null);
   const dispatch = useAppDispatch();
   const { hydrated } = useAppSelector((state) => state.auth);
@@ -62,11 +63,13 @@ export function OurCitiesPage() {
   const [bookingLoadingId, setBookingLoadingId] = useState<number | null>(null);
 
   // Search Bar State
-  const [searchFrom, setSearchFrom] = useState("");
-  const [searchTo, setSearchTo] = useState("");
-  const [searchDate, setSearchDate] = useState("");
-  const [searchPassengers, setSearchPassengers] = useState(2);
-  const [isSearchActive, setIsSearchActive] = useState(false);
+  const searchParams = useSearchParams();
+  const [searchFrom, setSearchFrom] = useState(searchParams.get("from") || "");
+  const [searchTo, setSearchTo] = useState(searchParams.get("to") || "");
+  const [searchDate, setSearchDate] = useState(searchParams.get("date") || "");
+  const passengersParam = searchParams.get("passengers");
+  const [searchPassengers, setSearchPassengers] = useState(passengersParam ? parseInt(passengersParam) : 2);
+  const [isSearchActive, setIsSearchActive] = useState(!!(searchParams.get("from") || searchParams.get("to")));
 
   const handleBookNow = async (journey: typeof journeys[0]) => {
     setBookingLoadingId(journey.id);
@@ -120,9 +123,6 @@ export function OurCitiesPage() {
       const matchTo = searchTo ? j.toLocation?.name === searchTo : true;
       const matchCapacity = j.vehicle && j.vehicle.capacity ? j.vehicle.capacity >= searchPassengers : true;
       return matchFrom && matchTo && matchCapacity;
-    }
-    if (selectedCity) {
-      return j.toLocation?.name?.toLowerCase().includes(selectedCity.name.toLowerCase());
     }
     return true; // Show all by default
   });
@@ -325,7 +325,7 @@ export function OurCitiesPage() {
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
                 <h2 className="text-2xl md:text-3xl font-bold text-transfer-dark">
-                  Available Vehicles {selectedCity ? `in ${selectedCity.name}` : "Across All Destinations"}
+                  Available Vehicles
                 </h2>
                 <span className="text-sm text-transfer-gray font-medium">Prices are per vehicle</span>
               </div>
@@ -437,7 +437,18 @@ export function OurCitiesPage() {
 
         </div>
       </section>
-
     </div>
+  );
+}
+
+export function OurCitiesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <Loader2 className="h-10 w-10 animate-spin text-transfer-green" />
+      </div>
+    }>
+      <OurCitiesContent />
+    </Suspense>
   );
 }

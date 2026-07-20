@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { apiRequest, ApiResponse } from "@/lib/apiClient";
-import { buildVehicleImageUrl } from "@/components/admin/vehicles/vehicleDisplay";
 import {
   CheckCircle2,
   Home,
@@ -18,7 +16,6 @@ import {
   ChevronLeft,
   Loader2,
   XCircle,
-  Printer,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -123,9 +120,6 @@ export default function BookingDetailsPage() {
     booking?.transferBookingDetails?.vehicleCategoryName ||
     null;
   const vehicleCapacity = booking?.perJourney?.vehicle?.capacity || null;
-  const vehicleImageUrl = booking?.perJourney?.vehicle?.imageUrl
-    ? buildVehicleImageUrl(booking.perJourney.vehicle.imageUrl)
-    : null;
 
   if (loading) {
     return (
@@ -200,12 +194,7 @@ export default function BookingDetailsPage() {
             </div>
           </div>
 
-          {/* Vehicle Image */}
-          {vehicleImageUrl && (
-            <div className="relative h-48 w-full bg-gray-100">
-              <Image src={vehicleImageUrl} alt={vehicleName} fill className="object-cover" />
-            </div>
-          )}
+
 
           <div className="p-6 flex flex-col gap-6">
             {/* Route */}
@@ -326,21 +315,14 @@ export default function BookingDetailsPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3">
               <Link
                 href="/"
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-transfer-green px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-transfer-green/90 hover:shadow-lg hover:shadow-transfer-green/20"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-transfer-green px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-transfer-green/90 hover:shadow-lg hover:shadow-transfer-green/20"
               >
                 <Home className="h-4 w-4" />
                 Return to Homepage
               </Link>
-              <button
-                onClick={() => window.print()}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 transition-all hover:bg-gray-50"
-              >
-                <Printer className="h-4 w-4" />
-                Print / Save
-              </button>
             </div>
           </div>
         </motion.div>

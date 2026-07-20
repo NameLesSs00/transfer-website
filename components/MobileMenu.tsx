@@ -66,6 +66,7 @@ export function MobileMenu({ onClose, onOpenBookingModal }: MobileMenuProps) {
           { name: "Routes", href: "/routes" },
           { name: "Contact Us", href: "/contact" },
           { name: "About Us", href: "/about" },
+          { name: "FAQ", href: "/faq" },
         ].map((link, i) => {
           const isActive = pathname === link.href;
           return (

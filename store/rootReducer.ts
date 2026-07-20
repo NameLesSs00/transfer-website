@@ -1,5 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { bookingReducer } from "./features/bookings/bookingSlice";
+import adminBookingsReducer from "./features/adminBookings/adminBookingsSlice";
 import { adminsReducer } from "./features/admins/adminsSlice";
 import { authReducer } from "./features/auth/authSlice";
 import { dashboardReducer } from "./features/dashboard/dashboardSlice";
@@ -16,6 +17,7 @@ import { vehiclesReducer } from "./features/vehicles/vehiclesSlice";
 
 export const rootReducer = combineReducers({
   booking: bookingReducer,
+  adminBookings: adminBookingsReducer,
   admins: adminsReducer,
   auth: authReducer,
   dashboard: dashboardReducer,

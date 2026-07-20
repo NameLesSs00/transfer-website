@@ -78,7 +78,7 @@ function ViewBookingModal({ onClose }: { onClose: () => void }) {
               type="text"
               value={code}
               onChange={(e) => { setCode(e.target.value); setError(null); }}
-              placeholder="e.g. BKG-20260720133010066-8432"
+              placeholder="Enter your booking reference code"
               className="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-mono text-transfer-dark placeholder-gray-400 outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/20 transition-all"
             />
           </div>
@@ -124,6 +124,7 @@ export function Header() {
     { name: "Cities", href: "/cities" },
     { name: "Routes", href: "/routes" },
     { name: "About us", href: "/about" },
+    { name: "FAQ", href: "/faq" },
     { name: "Contact us", href: "/contact" },
   ];
 
