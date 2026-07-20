@@ -17,6 +17,7 @@ export function Header() {
     { name: "Home", href: "/" },
     { name: "Fleet", href: "/fleet" },
     { name: "Cities", href: "/cities" },
+    { name: "Routes", href: "/routes" },
     { name: "About us", href: "/about" },
     { name: "Contact us", href: "/contact" },
   ];

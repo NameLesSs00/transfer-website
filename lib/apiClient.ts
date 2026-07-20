@@ -99,6 +99,10 @@ async function resolveAccessToken(token?: string | null) {
 
   const currentToken = token ?? getStoredAccessToken();
 
+  if (!currentToken) {
+    return null;
+  }
+
   if (currentToken && !shouldRefreshAccessToken(currentToken)) {
     return currentToken;
   }
@@ -107,12 +111,8 @@ async function resolveAccessToken(token?: string | null) {
     const session = await getRefreshPromise(currentToken);
     return session.accessToken;
   } catch (error) {
-    if (!currentToken || shouldRefreshAccessToken(currentToken)) {
-      notifyLoggedOut();
-      throw error;
-    }
-
-    return currentToken;
+    notifyLoggedOut();
+    throw error;
   }
 }
 

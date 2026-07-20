@@ -62,6 +62,7 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
           { name: "Home", href: "/" },
           { name: "Fleet", href: "/fleet" },
           { name: "Cities", href: "/cities" },
+          { name: "Routes", href: "/routes" },
           { name: "Contact Us", href: "/contact" },
           { name: "About Us", href: "/about" },
         ].map((link, i) => {
