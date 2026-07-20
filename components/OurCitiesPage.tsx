@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -10,15 +10,19 @@ import {
   Users,
   ChevronRight,
   Check,
-  CalendarCheck,
-  DollarSign,
   User,
-  PhoneCall,
   Star,
   Luggage,
   AirVent,
+  Loader2,
 } from "lucide-react";
 import { Button } from "./ui/Button";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchPerJourneys } from "@/store/features/perJourneys/perJourneysSlice";
+import { hydrateAuth } from "@/store/features/auth/authSlice";
+import { buildVehicleImageUrl } from "@/components/admin/vehicles/vehicleDisplay";
+import { useRouter } from "next/navigation";
+import { setSelectedJourney, calculatePrice } from "@/store/features/bookings/bookingSlice";
 
 /* ─── Data ─────────────────────────────────────────────────────────── */
 const cities = [
@@ -27,75 +31,74 @@ const cities = [
     name: "Hurghada",
     price: "$10.00",
     image: "/ourCities/Hurghada.jpg",
-    description:
-      "Hurghada is one of the most popular destinations on the Red Sea. We provide reliable and comfortable airport transfers from Hurghada Airport to all hotels and resorts in Hurghada.",
-    destinations: [
-      { name: "Soma Bay", km: 24 },
-      { name: "Sahl Hasheesh", km: 27 },
-      { name: "El Gouna", km: 25 },
-      { name: "Makadi Bay", km: 34 },
-    ],
   },
   {
     id: "soma-bay",
     name: "Soma Bay",
     price: "$18.00",
     image: "/ourCities/SomaBay.png",
-    description:
-      "Soma Bay is an exclusive peninsula resort area located 45 km south of Hurghada. Known for its crystal clear waters and world-class resorts, we provide seamless transfers to all properties.",
-    destinations: [
-      { name: "Hurghada", km: 45 },
-      { name: "Sahl Hasheesh", km: 18 },
-      { name: "El Gouna", km: 70 },
-      { name: "Makadi Bay", km: 12 },
-    ],
   },
   {
     id: "sahl-hasheesh",
     name: "Sahl Hasheesh",
     price: "$15.00",
     image: "/ourCities/SahlHasheesh.png",
-    description:
-      "Sahl Hasheesh is a planned resort town located 18 km south of Hurghada. It features beautiful beaches and luxurious hotels, all easily accessible with our professional transfer service.",
-    destinations: [
-      { name: "Hurghada", km: 18 },
-      { name: "Soma Bay", km: 27 },
-      { name: "El Gouna", km: 43 },
-      { name: "Makadi Bay", km: 16 },
-    ],
   },
   {
     id: "el-gouna",
     name: "El Gouna",
     price: "$12.00",
     image: "/ourCities/ElGouna.png",
-    description:
-      "El Gouna is a self-contained resort town located 22 km north of Hurghada. This unique lagoon city offers a tranquil escape, and our drivers know every corner of it.",
-    destinations: [
-      { name: "Hurghada", km: 22 },
-      { name: "Soma Bay", km: 65 },
-      { name: "Sahl Hasheesh", km: 40 },
-      { name: "Makadi Bay", km: 56 },
-    ],
   },
-];
-
-const vehicles = [
-  { type: "Private Car", badge: "PRIVATE", passengers: 3, luggage: 3, price: "$10.00" },
-  { type: "Private Limousine", badge: "PRIVATE", passengers: 3, luggage: 3, price: "$10.00" },
-  { type: "Private Limousine", badge: "PRIVATE", passengers: 3, luggage: 3, price: "$10.00" },
-];
-
-const features = [
-  { icon: CalendarCheck, title: "Easy Booking", desc: "Book in advance in just a few steps" },
-  { icon: DollarSign, title: "Fixed Prices", desc: "No hidden fees, what you see is what you pay" },
-  { icon: User, title: "Professional Drivers", desc: "Experienced, friendly and always on time" },
-  { icon: PhoneCall, title: "24/7 Support", desc: "We're here to help you anytime, anywhere" },
 ];
 
 /* ─── Component ─────────────────────────────────────────────────────── */
 export function OurCitiesPage() {
   const [selectedCity, setSelectedCity] = useState(cities[0]);
+  const dispatch = useAppDispatch();
+  const { hydrated } = useAppSelector((state) => state.auth);
+  const { items: journeys, listStatus } = useAppSelector((state) => state.perJourneys);
+  const router = useRouter();
+  const [bookingLoadingId, setBookingLoadingId] = useState<number | null>(null);
+
+  const handleBookNow = async (journey: typeof journeys[0]) => {
+    setBookingLoadingId(journey.id);
+    dispatch(
+      setSelectedJourney({
+        perJourneyId: journey.id,
+        journeySnapshot: {
+          vehicleName: journey.vehicle?.name || "Standard Vehicle",
+          vehicleCapacity: journey.vehicle?.capacity || 4,
+          vehicleCategoryName: journey.vehicle?.vehicleCategoryName || "",
+          imageUrl: journey.vehicle?.imageUrl || null,
+          fromLocation: journey.fromLocation?.name || "",
+          toLocation: journey.toLocation?.name || "",
+        },
+      })
+    );
+    try {
+      await dispatch(calculatePrice({ perJourneyId: journey.id, tripType: 1 })).unwrap();
+      router.push("/billing");
+    } catch (err) {
+      console.error(err);
+      alert("Could not calculate price. Please try again.");
+      setBookingLoadingId(null);
+    }
+  };
+
+  // Hydrate auth first (needed by apiClient even for public endpoints)
+  useEffect(() => {
+    dispatch(hydrateAuth());
+  }, [dispatch]);
+
+  // Fetch journeys once auth is hydrated
+  useEffect(() => {
+    if (!hydrated) return;
+    dispatch(fetchPerJourneys({ pageNumber: 1, pageSize: 100 }));
+  }, [dispatch, hydrated]);
+
+  // City cards are decorative UI — show ALL journeys from the API
+  const filteredJourneys = journeys;
 
   return (
     <div className="w-full flex flex-col overflow-x-clip bg-white">
@@ -255,157 +258,173 @@ export function OurCitiesPage() {
         </div>
       </section>
 
-      {/* ── 3 & 4. Vehicles + City Info ──────────────────────────────── */}
-      <section className="w-full max-w-7xl mx-auto overflow-x-clip px-4 py-12 md:px-12 md:py-16 lg:px-24">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-10">
+      {/* ── 3. Vehicles Centered ──────────────────────────────── */}
+      <section className="w-full max-w-4xl mx-auto overflow-x-clip px-4 py-12 md:px-12 md:py-16">
+        <div className="flex flex-col gap-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedCity.id + "-vehicles"}
+              className="flex flex-col gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-transfer-dark">
+                  Available Vehicles in {selectedCity.name}
+                </h2>
+                <span className="text-sm text-transfer-gray font-medium">Prices are per vehicle</span>
+              </div>
 
-          {/* ── City Info (left on desktop, bottom on mobile) ────────── */}
-          <div className="w-full lg:w-[380px] flex-shrink-0 flex flex-col gap-8 order-2 lg:order-1">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedCity.id + "-info"}
-                className="flex flex-col gap-6"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 12 }}
-                transition={{ duration: 0.4 }}
-              >
-                {/* City title */}
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-6 h-6 text-transfer-green flex-shrink-0" />
-                  <h2 className="text-3xl font-bold text-transfer-dark">{selectedCity.name}</h2>
+              {listStatus === "loading" && (
+                <div className="py-12 flex justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-transfer-green" />
                 </div>
+              )}
 
-                {/* Description */}
-                <p className="text-transfer-gray leading-relaxed text-base">{selectedCity.description}</p>
-
-                {/* Features grid */}
-                <div className="grid grid-cols-2 gap-6 pt-2">
-                  {features.map((f) => {
-                    const Icon = f.icon;
-                    return (
-                      <div key={f.title} className="flex flex-col items-center text-center gap-2.5">
-                        <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-transfer-light-green">
-                          <Icon className="w-6 h-6 text-transfer-green" />
-                        </div>
-                        <span className="text-sm font-bold text-transfer-dark leading-tight">{f.title}</span>
-                        <span className="text-xs text-transfer-gray leading-relaxed">{f.desc}</span>
-                      </div>
-                    );
-                  })}
+              {listStatus !== "loading" && filteredJourneys.length === 0 && (
+                <div className="py-12 text-center text-transfer-gray">
+                  No vehicles available for this destination at the moment.
                 </div>
+              )}
 
-                {/* Popular Destinations */}
-                <div className="flex flex-col gap-4 mt-4">
-                  <h3 className="text-xl font-bold text-transfer-dark">
-                    Popular Destinations from {selectedCity.name}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {selectedCity.destinations.map((d) => (
-                      <div
-                        key={d.name}
-                        className="border border-gray-100 bg-gray-50 rounded-xl px-4 py-3.5 flex flex-col gap-1.5 shadow-sm"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-[#aeb6c0]" />
-                          <span className="text-sm font-bold text-transfer-dark leading-tight">{d.name}</span>
-                        </div>
-                        <span className="text-xs text-transfer-gray font-medium pl-5">{d.km} km</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+              {/* Vehicle list — grouped by pricing type */}
+              {(() => {
+                const fixedTrip = filteredJourneys.filter(
+                  (j) => j.vehicle?.vehicleCategory?.pricingType === "FixedTrip"
+                );
+                const perPerson = filteredJourneys.filter(
+                  (j) => j.vehicle?.vehicleCategory?.pricingType === "PerPerson"
+                );
+                // Fallback: if pricingType is missing, put in fixedTrip group
+                const ungrouped = filteredJourneys.filter(
+                  (j) => !j.vehicle?.vehicleCategory?.pricingType
+                );
 
-          {/* ── Vehicles (right on desktop, top on mobile) ───────────── */}
-          <div className="flex-1 flex flex-col gap-6 order-1 lg:order-2">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedCity.id + "-vehicles"}
-                className="flex flex-col gap-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
-                  <h2 className="text-2xl md:text-3xl font-bold text-transfer-dark">
-                    Available Vehicles in {selectedCity.name}
-                  </h2>
-                  <span className="text-sm text-transfer-gray font-medium">Prices are per vehicle</span>
-                </div>
+                const allFixed = [...fixedTrip, ...ungrouped];
 
-                {/* Vehicle list */}
-                <div className="flex flex-col divide-y divide-gray-100">
-                  {vehicles.map((v, i) => (
-                    <motion.div
-                      key={i}
-                      className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-6 py-8"
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: i * 0.1 }}
-                    >
-                      {/* Car image - Made much bigger for mobile and desktop */}
-                      <div className="relative w-full max-w-[280px] sm:w-[240px] md:w-[320px] lg:w-[360px] flex-shrink-0 aspect-[16/9] lg:mr-4">
+                const renderJourneyCard = (journey: typeof filteredJourneys[0], i: number) => (
+                  <motion.div
+                    key={journey.id}
+                    className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-6 py-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
+                  >
+                    {/* Car image */}
+                    <div className="relative w-full max-w-[280px] sm:w-[240px] md:w-[280px] flex-shrink-0 aspect-[16/9] lg:mr-4 flex items-center justify-center bg-[#fbf5f0] rounded-xl overflow-hidden p-4">
+                      {journey.vehicle?.imageUrl ? (
                         <Image
-                          src="/ourCities/whiteCarWhiteBg.png"
-                          alt={v.type}
+                          src={buildVehicleImageUrl(journey.vehicle.imageUrl)}
+                          alt={journey.vehicle.name || "Vehicle"}
                           fill
                           draggable={false}
-                          className="object-contain"
+                          className="object-contain p-2"
                         />
-                      </div>
+                      ) : (
+                        <div className="text-transfer-gray flex flex-col items-center gap-2">
+                          <Plane className="w-8 h-8 opacity-20" />
+                          <span className="text-xs">No image</span>
+                        </div>
+                      )}
+                    </div>
 
-                      {/* Info & Price Wrapper */}
-                      <div className="w-full flex-1 flex flex-col sm:flex-row gap-6 justify-between">
-                        {/* Info */}
-                        <div className="flex flex-col gap-3">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <span className="text-lg font-bold text-transfer-dark">{v.type}</span>
+                    {/* Info & Price Wrapper */}
+                    <div className="w-full flex-1 flex flex-col sm:flex-row gap-6 justify-between">
+                      {/* Info */}
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <span className="text-lg font-bold text-transfer-dark">{journey.vehicle?.name || "Standard Vehicle"}</span>
+                          {journey.vehicle?.vehicleCategoryName && (
                             <span className="rounded-full bg-[#e8f8ee] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#3aa765]">
-                              {v.badge}
+                              {journey.vehicle.vehicleCategoryName}
                             </span>
-                          </div>
-                          <div className="flex flex-col gap-2 text-sm text-transfer-gray mt-1">
-                            <div className="flex items-center gap-2">
-                              <User className="w-4 h-4 text-transfer-green" />
-                              <span className="font-medium">Up to {v.passengers} Passengers</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Luggage className="w-4 h-4 text-transfer-green" />
-                              <span className="font-medium">{v.luggage} Luggage</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <AirVent className="w-4 h-4 text-transfer-green" />
-                              <span className="font-medium">Air Conditioned</span>
-                            </div>
-                          </div>
+                          )}
                         </div>
-
-                        {/* Price + rating + button */}
-                        <div className="flex flex-col items-start sm:items-end gap-3 flex-shrink-0 mt-2 sm:mt-0 border-t sm:border-t-0 border-gray-100 pt-4 sm:pt-0">
-                          <div className="text-left sm:text-right">
-                            <div className="text-3xl font-bold text-transfer-green">{v.price}</div>
-                            <div className="text-xs font-medium text-transfer-gray mt-0.5">Per Person</div>
-                            <div className="flex items-center gap-1 sm:justify-end mt-2">
-                              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm font-bold text-transfer-dark">5.0</span>
-                              <span className="text-xs font-medium text-transfer-gray">(128)</span>
-                            </div>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <MapPin className="w-4 h-4 text-transfer-green flex-shrink-0" />
+                          <span className="text-sm font-bold text-transfer-dark">
+                            {journey.fromLocation?.name}
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mx-1" />
+                          <span className="text-sm font-bold text-transfer-dark">
+                            {journey.toLocation?.name}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2 text-sm text-transfer-gray mt-2">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-transfer-green" />
+                            <span className="font-medium">Up to {journey.vehicle?.capacity || 4} Passengers</span>
                           </div>
-                          <Button href="/billing" className="w-full sm:w-auto px-8 py-3 text-sm mt-1">Book Now</Button>
                         </div>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+
+                      {/* Price + button */}
+                      <div className="flex flex-col items-start sm:items-end gap-3 flex-shrink-0 mt-2 sm:mt-0 border-t sm:border-t-0 border-gray-100 pt-4 sm:pt-0">
+                        <div className="text-left sm:text-right">
+                          <div className="text-3xl font-bold text-transfer-green">${journey.price}</div>
+                          <div className="text-xs font-medium text-transfer-gray mt-0.5">
+                            {journey.vehicle?.vehicleCategory?.pricingType === "PerPerson"
+                              ? "Per Person"
+                              : "Fixed Trip Price"}
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => handleBookNow(journey)}
+                          disabled={bookingLoadingId === journey.id}
+                          className="w-full sm:w-auto px-8 py-3 text-sm mt-1 cursor-pointer"
+                        >
+                          {bookingLoadingId === journey.id ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
+                              Loading...
+                            </>
+                          ) : (
+                            "Book Now"
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+
+                return (
+                  <>
+                    {/* ── Fixed Trip Group ── */}
+                    {allFixed.length > 0 && (
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-3 py-4">
+                          <span className="text-sm font-bold uppercase tracking-widest text-transfer-green">Fixed Trip</span>
+                          <div className="flex-1 h-px bg-gray-100" />
+                          <span className="text-xs text-transfer-gray font-medium">One price for the whole vehicle</span>
+                        </div>
+                        <div className="flex flex-col divide-y divide-gray-100">
+                          {allFixed.map((journey, i) => renderJourneyCard(journey, i))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── Per Person Group ── */}
+                    {perPerson.length > 0 && (
+                      <div className="flex flex-col mt-6">
+                        <div className="flex items-center gap-3 py-4">
+                          <span className="text-sm font-bold uppercase tracking-widest text-blue-500">Per Person</span>
+                          <div className="flex-1 h-px bg-gray-100" />
+                          <span className="text-xs text-transfer-gray font-medium">Price is charged per passenger</span>
+                        </div>
+                        <div className="flex flex-col divide-y divide-gray-100">
+                          {perPerson.map((journey, i) => renderJourneyCard(journey, i))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </motion.div>
+          </AnimatePresence>
 
         </div>
       </section>
