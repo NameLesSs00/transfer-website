@@ -22,6 +22,7 @@ import {
   createBooking,
   initializePayment,
   clearError,
+  calculatePrice,
 } from "@/store/features/bookings/bookingSlice";
 import { buildVehicleImageUrl } from "@/components/admin/vehicles/vehicleDisplay";
 
@@ -87,6 +88,9 @@ export default function BillingPage() {
     bookingStatus,
     paymentStatus,
     error,
+    bookingMode,
+    transferRouteId,
+    vehicleCategoryId,
   } = bookingState;
 
   // Form states
@@ -98,18 +102,27 @@ export default function BillingPage() {
   const [returnDate, setReturnDate] = useState("");
   const [returnTime, setReturnTime] = useState("");
   const [passengarCount, setPassengarCount] = useState(1);
-  const [agreedToTerms, setAgreedToTerms] = useState(true);
+
+  // Transfer-specific fields
+  const [flightNumber, setFlightNumber] = useState("");
 
   // Redirect back if no journey selected (e.g. direct load of /billing)
   useEffect(() => {
-    if (!perJourneyId) {
+    if (!bookingMode) {
       router.push("/cities");
     }
-  }, [perJourneyId, router]);
+  }, [bookingMode, router]);
 
-  if (!perJourneyId || !journeySnapshot) {
+  if (!bookingMode || !journeySnapshot) {
     return null; // Will redirect shortly
   }
+
+  // Recalculate price when passenger count changes (only for TransferRoute mode)
+  useEffect(() => {
+    if (bookingMode === "TransferRoute" && passengarCount > 0) {
+      dispatch(calculatePrice(passengarCount));
+    }
+  }, [passengarCount, bookingMode, dispatch]);
 
   const finalPrice = basePrice ? (tripType === 2 ? basePrice * 2 : basePrice) : 0;
   const isLoading = bookingStatus === "loading" || paymentStatus === "loading";
@@ -122,15 +135,14 @@ export default function BillingPage() {
     e.preventDefault();
     dispatch(clearError());
 
-    if (!agreedToTerms) {
-      alert("Please agree to the Terms & Conditions.");
-      return;
-    }
-
     let depDateIso = "";
     if (departureDate && departureTime) {
       const d = new Date(`${departureDate}T${departureTime}`);
       if (!isNaN(d.getTime())) {
+        if (d.getTime() < Date.now()) {
+          alert("Departure date and time cannot be in the past.");
+          return;
+        }
         depDateIso = d.toISOString();
       }
     } else {
@@ -143,6 +155,10 @@ export default function BillingPage() {
       if (returnDate && returnTime) {
         const d = new Date(`${returnDate}T${returnTime}`);
         if (!isNaN(d.getTime())) {
+          if (d.getTime() < Date.now()) {
+            alert("Return date and time cannot be in the past.");
+            return;
+          }
           retDateIso = d.toISOString();
         }
       } else {
@@ -151,19 +167,47 @@ export default function BillingPage() {
       }
     }
 
-    const payload = {
-      customerName,
-      customerEmail,
-      customerPhoneNumber,
-      bookingDate: new Date().toISOString(), // client UTC time
-      departureDate: depDateIso,
-      departureTime: `${departureTime}:00`, // HH:mm:ss
-      returnDate: retDateIso,
-      returnTime: tripType === 2 && returnTime ? `${returnTime}:00` : undefined,
-      tripType,
-      passengarCount,
-      perJourneyId,
-    };
+    let payload: any;
+    
+    if (bookingMode === "TransferRoute") {
+      if (!transferRouteId || !vehicleCategoryId) {
+        alert("Invalid Transfer Route Selected");
+        return;
+      }
+      payload = {
+        customerName,
+        customerEmail,
+        customerPhoneNumber,
+        bookingDate: new Date().toISOString(),
+        departureDate: depDateIso,
+        departureTime: `${departureTime}:00`,
+        returnDate: retDateIso,
+        returnTime: tripType === 2 && returnTime ? `${returnTime}:00` : undefined,
+        tripType,
+        transferRouteId,
+        vehicleCategoryId,
+        passengarCount,
+        flightNumber: flightNumber || undefined,
+      };
+    } else {
+      if (!perJourneyId) {
+        alert("Invalid Journey Selected");
+        return;
+      }
+      payload = {
+        customerName,
+        customerEmail,
+        customerPhoneNumber,
+        bookingDate: new Date().toISOString(),
+        departureDate: depDateIso,
+        departureTime: `${departureTime}:00`,
+        returnDate: retDateIso,
+        returnTime: tripType === 2 && returnTime ? `${returnTime}:00` : undefined,
+        tripType,
+        passengarCount,
+        perJourneyId,
+      };
+    }
 
     try {
       const bookingId = await dispatch(createBooking(payload)).unwrap();
@@ -206,8 +250,12 @@ export default function BillingPage() {
                   priority
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gray-50 rounded-xl">
-                  <Plane className="h-10 w-10 text-gray-300" />
+                <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-transfer-green/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="relative z-10 p-4 bg-white rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.05)] mb-3 transition-transform duration-300 group-hover:scale-110">
+                    <Car className="h-8 w-8 text-transfer-green" />
+                  </div>
+                  <span className="relative z-10 text-[11px] font-bold text-gray-500 uppercase tracking-[0.15em]">Standard Vehicle</span>
                 </div>
               )}
             </div>
@@ -220,12 +268,14 @@ export default function BillingPage() {
 
             <div className="mt-4 flex flex-col gap-2 border-b border-gray-100 pb-4">
               <strong className="text-lg text-transfer-dark">{journeySnapshot.vehicleName}</strong>
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-[#667085]">
-                <span className="inline-flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Up to {journeySnapshot.vehicleCapacity} Passengers
-                </span>
-              </div>
+              {bookingMode === "PerJourney" && (
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-[#667085]">
+                  <span className="inline-flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Up to {journeySnapshot.vehicleCapacity} Passengers
+                  </span>
+                </div>
+              )}
               <div className="mt-2 text-sm text-gray-500">
                 <p><strong>From:</strong> {journeySnapshot.fromLocation}</p>
                 <p><strong>To:</strong> {journeySnapshot.toLocation}</p>
@@ -317,6 +367,22 @@ export default function BillingPage() {
                 />
               </Field>
             </div>
+
+            {/* Additional fields for Transfer Routes */}
+            {bookingMode === "TransferRoute" && (
+              <div className="mt-5 border-t border-gray-100 pt-5">
+                <div className="grid gap-5 md:grid-cols-2">
+                  <Field label="Flight Number (Optional)">
+                    <input
+                      value={flightNumber}
+                      onChange={(e) => setFlightNumber(e.target.value)}
+                      className={inputClass}
+                      placeholder="e.g. MS778"
+                    />
+                  </Field>
+                </div>
+              </div>
+            )}
           </Section>
 
           {/* Transfer Details */}
@@ -367,6 +433,7 @@ export default function BillingPage() {
                     <input
                       required
                       type="date"
+                      min={new Date().toISOString().split("T")[0]}
                       value={departureDate}
                       onChange={(e) => setDepartureDate(e.target.value)}
                       className={`${inputClass} pl-11`}
@@ -394,6 +461,7 @@ export default function BillingPage() {
                         <input
                           required
                           type="date"
+                          min={new Date().toISOString().split("T")[0]}
                           value={returnDate}
                           onChange={(e) => setReturnDate(e.target.value)}
                           className={`${inputClass} pl-11`}
@@ -415,12 +483,12 @@ export default function BillingPage() {
                   </>
                 )}
 
-                <Field label="Passengers No" required>
+                <Field label="Passenger Count" required>
                   <input
                     required
                     type="number"
                     min="1"
-                    max={journeySnapshot.vehicleCapacity}
+                    max={bookingMode === "PerJourney" ? journeySnapshot.vehicleCapacity : undefined}
                     value={passengarCount}
                     onChange={(e) => setPassengarCount(parseInt(e.target.value) || 1)}
                     className={inputClass}
@@ -439,24 +507,7 @@ export default function BillingPage() {
               </div>
             )}
 
-            <label className="flex items-start gap-3 text-sm font-medium text-[#667085]">
-              <input
-                type="checkbox"
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-transfer-green accent-transfer-green"
-              />
-              <span>
-                I have read and agree to the{" "}
-                <a href="#" className="font-medium text-transfer-green">
-                  Terms & Conditions
-                </a>{" "}
-                and{" "}
-                <a href="#" className="font-medium text-transfer-green">
-                  Privacy Policy
-                </a>
-              </span>
-            </label>
+
 
             <button
               type="submit"
@@ -469,11 +520,6 @@ export default function BillingPage() {
               </span>
               <span className="text-sm font-medium text-white/80">Total: €{finalPrice}</span>
             </button>
-
-            <p className="flex items-center justify-center gap-2 text-center text-sm font-medium text-[#8a94a3]">
-              <Shield className="h-4 w-4 fill-transfer-green text-transfer-green" />
-              Free cancellation up to 24 hours before your transfer
-            </p>
           </section>
 
         </div>

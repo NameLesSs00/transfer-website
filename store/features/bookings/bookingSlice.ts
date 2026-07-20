@@ -10,11 +10,16 @@ import {
   CreateBookingPayload,
 } from "./bookingsModels";
 
+import { RootState } from "@/store";
+
 /* ────────────────────────────────────────────────────────────
    Initial state
 ──────────────────────────────────────────────────────────── */
 const initialState: BookingState = {
+  bookingMode: null,
   perJourneyId: null,
+  transferRouteId: null,
+  vehicleCategoryId: null,
   journeySnapshot: null,
   tripType: 1,
   basePrice: null,
@@ -29,20 +34,33 @@ const initialState: BookingState = {
    Thunks
 ──────────────────────────────────────────────────────────── */
 
-/** Fetch the base (one-way) EUR price for a journey. */
+/** Fetch the base (one-way) EUR price for the selected journey or route. */
 export const calculatePrice = createAsyncThunk(
   "booking/calculatePrice",
-  async (payload: CalculatePricePayload, { rejectWithValue }) => {
+  async (passengarCount: number = 1, { getState, rejectWithValue }) => {
+    const state = (getState() as RootState).booking;
+    
     try {
-      // Always request tripType:1; we multiply ×2 client-side for round-trips
-      const res = await calculatePerJourneyPriceRequest({
-        perJourneyId: payload.perJourneyId,
-        tripType: 1,
-      });
-      if (!res.success) {
-        return rejectWithValue(res.message || "Failed to calculate price");
+      if (state.bookingMode === "PerJourney" && state.perJourneyId) {
+        const res = await calculatePerJourneyPriceRequest({
+          perJourneyId: state.perJourneyId,
+          tripType: 1,
+        });
+        if (!res.success) return rejectWithValue(res.message || "Failed to calculate price");
+        return res.data;
+      } 
+      else if (state.bookingMode === "TransferRoute" && state.transferRouteId && state.vehicleCategoryId) {
+        const { calculateTransferPriceRequest } = await import("./bookingsApi");
+        const res = await calculateTransferPriceRequest({
+          transferRouteId: state.transferRouteId,
+          vehicleCategoryId: state.vehicleCategoryId,
+          passengarCount,
+          tripType: 1,
+        });
+        if (!res.success) return rejectWithValue(res.message || "Failed to calculate transfer price");
+        return res.data;
       }
-      return res.data; // number in EUR
+      return rejectWithValue("No valid booking selected");
     } catch (err: unknown) {
       return rejectWithValue(
         err instanceof Error ? err.message : "Failed to calculate price"
@@ -54,13 +72,27 @@ export const calculatePrice = createAsyncThunk(
 /** Create a booking and store the returned bookingId. */
 export const createBooking = createAsyncThunk(
   "booking/createBooking",
-  async (payload: CreateBookingPayload, { rejectWithValue }) => {
+  async (payload: any, { getState, rejectWithValue }) => {
+    const state = (getState() as RootState).booking;
+    
     try {
-      const res = await createPerJourneyBookingRequest(payload);
-      if (!res.success) {
-        return rejectWithValue(res.message || "Failed to create booking");
+      if (state.bookingMode === "PerJourney") {
+        const res = await createPerJourneyBookingRequest(payload);
+        if (!res.success) {
+          let errMsgs = Array.isArray(res.errors) && res.errors.length > 0 ? (res.errors as string[]).join(", ") : res.message;
+          return rejectWithValue(errMsgs || "Failed to create per-journey booking");
+        }
+        return res.data;
+      } else if (state.bookingMode === "TransferRoute") {
+        const { createTransferBookingRequest } = await import("./bookingsApi");
+        const res = await createTransferBookingRequest(payload);
+        if (!res.success) {
+          let errMsgs = Array.isArray(res.errors) && res.errors.length > 0 ? (res.errors as string[]).join(", ") : res.message;
+          return rejectWithValue(errMsgs || "Failed to create transfer booking");
+        }
+        return res.data;
       }
-      return res.data; // bookingId
+      return rejectWithValue("No valid booking selected");
     } catch (err: unknown) {
       return rejectWithValue(
         err instanceof Error ? err.message : "Failed to create booking"
@@ -102,9 +134,34 @@ const bookingSlice = createSlice({
         journeySnapshot: BookingState["journeySnapshot"];
       }>
     ) {
+      state.bookingMode = "PerJourney";
       state.perJourneyId = action.payload.perJourneyId;
+      state.transferRouteId = null;
+      state.vehicleCategoryId = null;
       state.journeySnapshot = action.payload.journeySnapshot;
-      // Reset any previous booking data
+      state.basePrice = null;
+      state.priceStatus = "idle";
+      state.bookingId = null;
+      state.bookingStatus = "idle";
+      state.paymentStatus = "idle";
+      state.error = null;
+    },
+    /** Called from the Routes page when the user clicks "Book Now" on a pricing card. */
+    setSelectedTransferRoute(
+      state,
+      action: PayloadAction<{
+        transferRouteId: number;
+        vehicleCategoryId: number;
+        journeySnapshot: BookingState["journeySnapshot"];
+      }>
+    ) {
+      state.bookingMode = "TransferRoute";
+      state.transferRouteId = action.payload.transferRouteId;
+      state.vehicleCategoryId = action.payload.vehicleCategoryId;
+      state.perJourneyId = null;
+      state.journeySnapshot = action.payload.journeySnapshot;
+      state.basePrice = null;
+      state.priceStatus = "idle";
       state.bookingId = null;
       state.bookingStatus = "idle";
       state.paymentStatus = "idle";
@@ -168,7 +225,7 @@ const bookingSlice = createSlice({
   },
 });
 
-export const { setSelectedJourney, setTripType, clearError, resetBooking } =
+export const { setSelectedJourney, setSelectedTransferRoute, setTripType, clearError, resetBooking } =
   bookingSlice.actions;
 
 export const bookingReducer = bookingSlice.reducer;

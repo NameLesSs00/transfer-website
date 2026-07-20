@@ -2,7 +2,9 @@ import { apiRequest } from "@/lib/apiClient";
 import {
   CalculatePricePayload,
   CalculatePriceResponse,
+  CalculateTransferPricePayload,
   CreateBookingPayload,
+  CreateTransferBookingPayload,
   CreateBookingResponse,
   InitializePaymentPayload,
   InitializePaymentResponse,
@@ -17,6 +19,21 @@ export function calculatePerJourneyPriceRequest(
 ) {
   return apiRequest<CalculatePriceResponse>(
     "/Bookings/calculate-per-journey-price",
+    {
+      method: "POST",
+      body: payload,
+    }
+  );
+}
+
+/**
+ * Returns the EUR price for a transfer route booking.
+ */
+export function calculateTransferPriceRequest(
+  payload: CalculateTransferPricePayload
+) {
+  return apiRequest<CalculatePriceResponse>(
+    "/Bookings/calculate-transfer-price",
     {
       method: "POST",
       body: payload,
@@ -40,6 +57,16 @@ export function createPerJourneyBookingRequest(payload: CreateBookingPayload) {
  */
 export function initializePaymentRequest(payload: InitializePaymentPayload) {
   return apiRequest<InitializePaymentResponse>("/Payments/initialize", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+/**
+ * Creates a transfer route booking and returns the new bookingId.
+ */
+export function createTransferBookingRequest(payload: CreateTransferBookingPayload) {
+  return apiRequest<CreateBookingResponse>("/Bookings/transfer", {
     method: "POST",
     body: payload,
   });

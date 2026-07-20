@@ -138,6 +138,12 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   });
 
   if (response.status === 401 && isBrowser()) {
+    if (!accessToken) {
+      // If there's no access token to begin with, the user is anonymous.
+      // Do not attempt to refresh; just return the 401 response.
+      return parseJson<T>(response);
+    }
+
     try {
       const session = await getRefreshPromise(accessToken);
       headers.set("Authorization", `Bearer ${session.accessToken}`);

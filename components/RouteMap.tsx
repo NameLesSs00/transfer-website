@@ -58,6 +58,8 @@ export default function RouteMap({ origin, destination }: RouteMapProps) {
   // Default center if no route is selected (e.g. Red Sea / Hurghada coordinates)
   const defaultCenter: [number, number] = [27.2579, 33.8116];
 
+  const [mapKey] = React.useState(() => Date.now());
+
   if (!mounted) {
     return (
       <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-gray-50 rounded-2xl border border-gray-200">
@@ -69,10 +71,12 @@ export default function RouteMap({ origin, destination }: RouteMapProps) {
   return (
     <div className="w-full h-full min-h-[400px] rounded-2xl overflow-hidden shadow-xl border border-gray-200">
       <MapContainer
+        key={mapKey}
         center={origin ? [origin.lat, origin.lng] : defaultCenter}
         zoom={origin ? 10 : 8}
         style={{ height: "100%", width: "100%", zIndex: 10 }}
         scrollWheelZoom={true}
+        attributionControl={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

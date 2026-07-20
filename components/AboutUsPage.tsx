@@ -270,7 +270,7 @@ export function AboutUsPage() {
           </div>
 
           <div className="relative z-20 flex-shrink-0">
-            <Button href="/billing" className="bg-[rgba(196,135,70,1)] px-5 py-4 text-sm hover:bg-[#ad743a] md:px-8 md:py-6 md:text-lg">
+            <Button href="/cities" className="bg-[rgba(196,135,70,1)] px-5 py-4 text-sm hover:bg-[#ad743a] md:px-8 md:py-6 md:text-lg">
               Book Transfer
             </Button>
           </div>

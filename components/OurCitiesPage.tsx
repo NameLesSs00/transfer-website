@@ -54,12 +54,19 @@ const cities = [
 
 /* ─── Component ─────────────────────────────────────────────────────── */
 export function OurCitiesPage() {
-  const [selectedCity, setSelectedCity] = useState(cities[0]);
+  const [selectedCity, setSelectedCity] = useState<typeof cities[0] | null>(null);
   const dispatch = useAppDispatch();
   const { hydrated } = useAppSelector((state) => state.auth);
   const { items: journeys, listStatus } = useAppSelector((state) => state.perJourneys);
   const router = useRouter();
   const [bookingLoadingId, setBookingLoadingId] = useState<number | null>(null);
+
+  // Search Bar State
+  const [searchFrom, setSearchFrom] = useState("");
+  const [searchTo, setSearchTo] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [searchPassengers, setSearchPassengers] = useState(2);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const handleBookNow = async (journey: typeof journeys[0]) => {
     setBookingLoadingId(journey.id);
@@ -77,7 +84,7 @@ export function OurCitiesPage() {
       })
     );
     try {
-      await dispatch(calculatePrice({ perJourneyId: journey.id, tripType: 1 })).unwrap();
+      await dispatch(calculatePrice(1)).unwrap();
       router.push("/billing");
     } catch (err) {
       console.error(err);
@@ -97,8 +104,28 @@ export function OurCitiesPage() {
     dispatch(fetchPerJourneys({ pageNumber: 1, pageSize: 100 }));
   }, [dispatch, hydrated]);
 
-  // City cards are decorative UI — show ALL journeys from the API
-  const filteredJourneys = journeys;
+  const uniqueFroms = Array.from(new Set(journeys.map(j => j.fromLocation?.name).filter(Boolean)));
+  const uniqueTos = Array.from(new Set(journeys.map(j => j.toLocation?.name).filter(Boolean)));
+
+  const handleSearch = () => {
+    setIsSearchActive(true);
+    // You could optionally dispatch these date/passengers to Redux if the store supported it,
+    // but for now, they act as a local filter or just UX completion.
+  };
+
+  // Filter logic: if search is active and locations are selected, use them. Otherwise fallback to selectedCity.
+  const filteredJourneys = journeys.filter((j) => {
+    if (isSearchActive) {
+      const matchFrom = searchFrom ? j.fromLocation?.name === searchFrom : true;
+      const matchTo = searchTo ? j.toLocation?.name === searchTo : true;
+      const matchCapacity = j.vehicle && j.vehicle.capacity ? j.vehicle.capacity >= searchPassengers : true;
+      return matchFrom && matchTo && matchCapacity;
+    }
+    if (selectedCity) {
+      return j.toLocation?.name?.toLowerCase().includes(selectedCity.name.toLowerCase());
+    }
+    return true; // Show all by default
+  });
 
   return (
     <div className="w-full flex flex-col overflow-x-clip bg-white">
@@ -160,7 +187,14 @@ export function OurCitiesPage() {
               <span className="text-[9px] md:text-[10px] font-semibold uppercase tracking-widest text-gray-400">From</span>
               <div className="flex items-center gap-1.5 md:gap-2">
                 <Plane className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#aeb6c0] flex-shrink-0" />
-                <span className="text-xs md:text-sm font-medium text-transfer-dark leading-tight line-clamp-2">Hurghada Airport (HRG)</span>
+                <select 
+                  value={searchFrom}
+                  onChange={(e) => { setSearchFrom(e.target.value); setIsSearchActive(false); }}
+                  className="w-full text-xs md:text-sm font-medium text-transfer-dark bg-transparent outline-none cursor-pointer"
+                >
+                  <option value="">Any Location</option>
+                  {uniqueFroms.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+                </select>
               </div>
             </div>
             {/* TO */}
@@ -168,7 +202,14 @@ export function OurCitiesPage() {
               <span className="text-[9px] md:text-[10px] font-semibold uppercase tracking-widest text-gray-400">To</span>
               <div className="flex items-center gap-1.5 md:gap-2">
                 <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#aeb6c0] flex-shrink-0" />
-                <span className="text-xs md:text-sm text-gray-400 leading-tight line-clamp-2">Pick-up Location</span>
+                <select 
+                  value={searchTo}
+                  onChange={(e) => { setSearchTo(e.target.value); setIsSearchActive(false); }}
+                  className="w-full text-xs md:text-sm font-medium text-transfer-dark bg-transparent outline-none cursor-pointer"
+                >
+                  <option value="">Any Location</option>
+                  {uniqueTos.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+                </select>
               </div>
             </div>
             {/* DATE & TIME */}
@@ -176,25 +217,36 @@ export function OurCitiesPage() {
               <span className="text-[9px] md:text-[10px] font-semibold uppercase tracking-widest text-gray-400">Date & Time</span>
               <div className="flex items-center gap-1.5 md:gap-2">
                 <CalendarDays className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#aeb6c0] flex-shrink-0" />
-                <span className="text-xs md:text-sm font-medium text-transfer-dark leading-tight line-clamp-2">20 May 2025, 10:00 AM</span>
+                <input 
+                  type="datetime-local" 
+                  value={searchDate}
+                  onChange={(e) => setSearchDate(e.target.value)}
+                  className="w-full text-xs md:text-sm font-medium text-transfer-dark bg-transparent outline-none" 
+                />
               </div>
             </div>
             {/* PASSENGERS */}
             <div className="flex flex-col gap-1 md:px-5 pl-2 md:pl-5 pt-3 md:pt-0 border-t border-l border-gray-100 md:border-none md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full">
                 <span className="text-[9px] md:text-[10px] font-semibold uppercase tracking-widest text-gray-400">Passengers</span>
                 <div className="flex items-center gap-1.5 md:gap-2">
                   <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#aeb6c0] flex-shrink-0" />
-                  <span className="text-xs md:text-sm font-medium text-transfer-dark leading-tight">2</span>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    value={searchPassengers}
+                    onChange={(e) => { setSearchPassengers(parseInt(e.target.value) || 1); setIsSearchActive(false); }}
+                    className="w-full text-xs md:text-sm font-medium text-transfer-dark bg-transparent outline-none" 
+                  />
                 </div>
               </div>
-              <Button className="col-span-2 md:col-span-1 mt-2 md:mt-0 px-6 py-3 text-sm md:ml-4 flex-shrink-0 hidden md:flex">
+              <Button onClick={handleSearch} className="col-span-2 md:col-span-1 mt-2 md:mt-0 px-6 py-3 text-sm md:ml-4 flex-shrink-0 hidden md:flex">
                 Search
               </Button>
             </div>
           </div>
           {/* Mobile search button */}
-          <Button className="w-full mt-4 py-3 md:hidden">Search</Button>
+          <Button onClick={handleSearch} className="w-full mt-4 py-3 md:hidden">Search</Button>
         </motion.div>
       </div>
 
@@ -206,7 +258,7 @@ export function OurCitiesPage() {
               key={city.id}
               onClick={() => setSelectedCity(city)}
               className={`relative w-[240px] flex-none rounded-2xl overflow-hidden cursor-pointer focus:outline-none snap-center shadow-sm ring-offset-2 ring-offset-white transition-shadow md:w-[260px] lg:w-full lg:min-w-0 ${
-                selectedCity.id === city.id ? "ring-2 ring-[#2f9e44]" : "ring-0"
+                selectedCity?.id === city.id ? "ring-2 ring-[#2f9e44]" : "ring-0"
               }`}
               style={{ aspectRatio: "4/3" }}
               initial={{ opacity: 0, y: 30 }}
@@ -227,7 +279,7 @@ export function OurCitiesPage() {
 
               {/* Selected checkmark */}
               <AnimatePresence>
-                {selectedCity.id === city.id && (
+                {selectedCity?.id === city.id && (
                   <motion.div
                     className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#2f9e44] flex items-center justify-center shadow-lg"
                     initial={{ scale: 0 }}
@@ -263,7 +315,7 @@ export function OurCitiesPage() {
         <div className="flex flex-col gap-6">
           <AnimatePresence mode="wait">
             <motion.div
-              key={selectedCity.id + "-vehicles"}
+              key={(selectedCity?.id || "all") + "-vehicles"}
               className="flex flex-col gap-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -273,7 +325,7 @@ export function OurCitiesPage() {
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
                 <h2 className="text-2xl md:text-3xl font-bold text-transfer-dark">
-                  Available Vehicles in {selectedCity.name}
+                  Available Vehicles {selectedCity ? `in ${selectedCity.name}` : "Across All Destinations"}
                 </h2>
                 <span className="text-sm text-transfer-gray font-medium">Prices are per vehicle</span>
               </div>
@@ -290,139 +342,96 @@ export function OurCitiesPage() {
                 </div>
               )}
 
-              {/* Vehicle list — grouped by pricing type */}
-              {(() => {
-                const fixedTrip = filteredJourneys.filter(
-                  (j) => j.vehicle?.vehicleCategory?.pricingType === "FixedTrip"
-                );
-                const perPerson = filteredJourneys.filter(
-                  (j) => j.vehicle?.vehicleCategory?.pricingType === "PerPerson"
-                );
-                // Fallback: if pricingType is missing, put in fixedTrip group
-                const ungrouped = filteredJourneys.filter(
-                  (j) => !j.vehicle?.vehicleCategory?.pricingType
-                );
+              {/* Vehicle list — flat, no grouping */}
+              {listStatus !== "loading" && filteredJourneys.length > 0 && (
+                <div className="flex flex-col divide-y divide-gray-100">
+                  {filteredJourneys.map((journey, i) => (
+                    <motion.div
+                      key={journey.id}
+                      className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-6 py-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: i * 0.08 }}
+                    >
+                      {/* Car image */}
+                      <div className="relative w-full max-w-[280px] sm:w-[240px] md:w-[280px] flex-shrink-0 aspect-[16/9] lg:mr-4 flex items-center justify-center bg-[#fbf5f0] rounded-xl overflow-hidden p-4">
+                        {journey.vehicle?.imageUrl ? (
+                          <Image
+                            src={buildVehicleImageUrl(journey.vehicle.imageUrl)}
+                            alt={journey.vehicle.name || "Vehicle"}
+                            fill
+                            draggable={false}
+                            className="object-contain p-2"
+                          />
+                        ) : (
+                          <div className="text-transfer-gray flex flex-col items-center gap-2">
+                            <Plane className="w-8 h-8 opacity-20" />
+                            <span className="text-xs">No image</span>
+                          </div>
+                        )}
+                      </div>
 
-                const allFixed = [...fixedTrip, ...ungrouped];
-
-                const renderJourneyCard = (journey: typeof filteredJourneys[0], i: number) => (
-                  <motion.div
-                    key={journey.id}
-                    className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-6 py-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.08 }}
-                  >
-                    {/* Car image */}
-                    <div className="relative w-full max-w-[280px] sm:w-[240px] md:w-[280px] flex-shrink-0 aspect-[16/9] lg:mr-4 flex items-center justify-center bg-[#fbf5f0] rounded-xl overflow-hidden p-4">
-                      {journey.vehicle?.imageUrl ? (
-                        <Image
-                          src={buildVehicleImageUrl(journey.vehicle.imageUrl)}
-                          alt={journey.vehicle.name || "Vehicle"}
-                          fill
-                          draggable={false}
-                          className="object-contain p-2"
-                        />
-                      ) : (
-                        <div className="text-transfer-gray flex flex-col items-center gap-2">
-                          <Plane className="w-8 h-8 opacity-20" />
-                          <span className="text-xs">No image</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Info & Price Wrapper */}
-                    <div className="w-full flex-1 flex flex-col sm:flex-row gap-6 justify-between">
-                      {/* Info */}
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <span className="text-lg font-bold text-transfer-dark">{journey.vehicle?.name || "Standard Vehicle"}</span>
-                          {journey.vehicle?.vehicleCategoryName && (
-                            <span className="rounded-full bg-[#e8f8ee] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#3aa765]">
-                              {journey.vehicle.vehicleCategoryName}
+                      {/* Info & Price Wrapper */}
+                      <div className="w-full flex-1 flex flex-col sm:flex-row gap-6 justify-between">
+                        {/* Info */}
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="text-lg font-bold text-transfer-dark">{journey.vehicle?.name || "Standard Vehicle"}</span>
+                            {journey.vehicle?.vehicleCategoryName && (
+                              <span className="rounded-full bg-[#e8f8ee] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#3aa765]">
+                                {journey.vehicle.vehicleCategoryName}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <MapPin className="w-4 h-4 text-transfer-green flex-shrink-0" />
+                            <span className="text-sm font-bold text-transfer-dark">
+                              {journey.fromLocation?.name}
                             </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <MapPin className="w-4 h-4 text-transfer-green flex-shrink-0" />
-                          <span className="text-sm font-bold text-transfer-dark">
-                            {journey.fromLocation?.name}
-                          </span>
-                          <ChevronRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mx-1" />
-                          <span className="text-sm font-bold text-transfer-dark">
-                            {journey.toLocation?.name}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-2 text-sm text-transfer-gray mt-2">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-transfer-green" />
-                            <span className="font-medium">Up to {journey.vehicle?.capacity || 4} Passengers</span>
+                            <ChevronRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mx-1" />
+                            <span className="text-sm font-bold text-transfer-dark">
+                              {journey.toLocation?.name}
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-2 text-sm text-transfer-gray mt-2">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-transfer-green" />
+                              <span className="font-medium">Up to {journey.vehicle?.capacity || 4} Passengers</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Price + button */}
-                      <div className="flex flex-col items-start sm:items-end gap-3 flex-shrink-0 mt-2 sm:mt-0 border-t sm:border-t-0 border-gray-100 pt-4 sm:pt-0">
-                        <div className="text-left sm:text-right">
-                          <div className="text-3xl font-bold text-transfer-green">${journey.price}</div>
-                          <div className="text-xs font-medium text-transfer-gray mt-0.5">
-                            {journey.vehicle?.vehicleCategory?.pricingType === "PerPerson"
-                              ? "Per Person"
-                              : "Fixed Trip Price"}
+                        {/* Price + button */}
+                        <div className="flex flex-col items-start sm:items-end gap-3 flex-shrink-0 mt-2 sm:mt-0 border-t sm:border-t-0 border-gray-100 pt-4 sm:pt-0">
+                          <div className="text-left sm:text-right">
+                            <div className="text-3xl font-bold text-transfer-green">${journey.price}</div>
+                            <div className="text-xs font-medium text-transfer-gray mt-0.5">
+                              {journey.vehicle?.vehicleCategory?.pricingType === "PerPerson"
+                                ? "Per Person"
+                                : "Fixed Trip Price"}
+                            </div>
                           </div>
-                        </div>
-                        <Button
-                          onClick={() => handleBookNow(journey)}
-                          disabled={bookingLoadingId === journey.id}
-                          className="w-full sm:w-auto px-8 py-3 text-sm mt-1 cursor-pointer"
-                        >
-                          {bookingLoadingId === journey.id ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
-                              Loading...
-                            </>
-                          ) : (
-                            "Book Now"
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-
-                return (
-                  <>
-                    {/* ── Fixed Trip Group ── */}
-                    {allFixed.length > 0 && (
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-3 py-4">
-                          <span className="text-sm font-bold uppercase tracking-widest text-transfer-green">Fixed Trip</span>
-                          <div className="flex-1 h-px bg-gray-100" />
-                          <span className="text-xs text-transfer-gray font-medium">One price for the whole vehicle</span>
-                        </div>
-                        <div className="flex flex-col divide-y divide-gray-100">
-                          {allFixed.map((journey, i) => renderJourneyCard(journey, i))}
+                          <Button
+                            onClick={() => handleBookNow(journey)}
+                            disabled={bookingLoadingId === journey.id}
+                            className="w-full sm:w-auto px-8 py-3 text-sm mt-1 cursor-pointer"
+                          >
+                            {bookingLoadingId === journey.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2 inline" />
+                                Loading...
+                              </>
+                            ) : (
+                              "Book Now"
+                            )}
+                          </Button>
                         </div>
                       </div>
-                    )}
-
-                    {/* ── Per Person Group ── */}
-                    {perPerson.length > 0 && (
-                      <div className="flex flex-col mt-6">
-                        <div className="flex items-center gap-3 py-4">
-                          <span className="text-sm font-bold uppercase tracking-widest text-blue-500">Per Person</span>
-                          <div className="flex-1 h-px bg-gray-100" />
-                          <span className="text-xs text-transfer-gray font-medium">Price is charged per passenger</span>
-                        </div>
-                        <div className="flex flex-col divide-y divide-gray-100">
-                          {perPerson.map((journey, i) => renderJourneyCard(journey, i))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
 

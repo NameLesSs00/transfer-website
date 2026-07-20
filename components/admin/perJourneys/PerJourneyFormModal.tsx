@@ -166,11 +166,13 @@ function PerJourneyFormModalContent() {
   );
   const vehicleSelectOptions = useMemo(
     () =>
-      vehicleOptions.map((vehicle) => ({
-        id: vehicle.id,
-        label: getVehicleLabel(vehicle),
-        caption: vehicle.vehicleCategoryName || vehicle.vehicleFactoryName || undefined,
-      })),
+      vehicleOptions
+        .filter((vehicle) => vehicle.vehicleCategory?.pricingType !== "PerPerson")
+        .map((vehicle) => ({
+          id: vehicle.id,
+          label: getVehicleLabel(vehicle),
+          caption: vehicle.vehicleCategoryName || vehicle.vehicleFactoryName || undefined,
+        })),
     [vehicleOptions]
   );
   const [openField, setOpenField] = useState<"from" | "to" | "vehicle" | null>(null);

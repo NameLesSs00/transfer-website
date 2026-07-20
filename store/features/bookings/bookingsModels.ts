@@ -6,6 +6,13 @@ export type CalculatePricePayload = {
   tripType: 1 | 2;
 };
 
+export type CalculateTransferPricePayload = {
+  transferRouteId: number;
+  vehicleCategoryId: number;
+  passengarCount: number;
+  tripType: 1 | 2;
+};
+
 export type CalculatePriceResponse = {
   success: boolean;
   message: string;
@@ -28,6 +35,22 @@ export type CreateBookingPayload = {
   tripType: 1 | 2;
   passengarCount: number;
   perJourneyId: number;
+};
+
+export type CreateTransferBookingPayload = {
+  customerName: string;
+  customerEmail: string;
+  customerPhoneNumber: string;
+  bookingDate: string;
+  departureDate: string;
+  departureTime: string;
+  returnDate?: string;
+  returnTime?: string;
+  tripType: 1 | 2;
+  transferRouteId: number;
+  vehicleCategoryId: number;
+  passengarCount: number;
+  flightNumber?: string;
 };
 
 export type CreateBookingResponse = {
@@ -58,9 +81,14 @@ export type InitializePaymentResponse = {
    Redux state shape
 ──────────────────────────────────────────────────────────── */
 export type BookingState = {
+  bookingMode: "PerJourney" | "TransferRoute" | null;
   /** The id of the vehicle journey card the user clicked */
   perJourneyId: number | null;
-  /** Snapshot of the journey card details for the summary sidebar */
+  /** IDs for Transfer Route bookings */
+  transferRouteId: number | null;
+  vehicleCategoryId: number | null;
+  
+  /** Snapshot of the journey/route card details for the summary sidebar */
   journeySnapshot: {
     vehicleName: string;
     vehicleCapacity: number;

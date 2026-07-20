@@ -15,7 +15,12 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchTransferRoutes } from "@/store/features/transferRoutes/transferRoutesSlice";
 import { fetchRoutePricings } from "@/store/features/routePricings/routePricingsSlice";
 import { fetchLocations } from "@/store/features/locations/locationsSlice";
+import { fetchVehicleCategories } from "@/store/features/vehicleCategories/vehicleCategoriesSlice";
 import { hydrateAuth } from "@/store/features/auth/authSlice";
+import { useRouter } from "next/navigation";
+import { setSelectedTransferRoute, calculatePrice } from "@/store/features/bookings/bookingSlice";
+import { RoutePricing } from "@/store/features/routePricings/routePricingsModels";
+
 
 // Dynamically import the map component since Leaflet requires the window object
 const RouteMap = dynamic(() => import("./RouteMap"), {
@@ -29,12 +34,52 @@ const RouteMap = dynamic(() => import("./RouteMap"), {
 
 export function OurRoutesPage() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const { hydrated } = useAppSelector((state) => state.auth);
   const { items: routes, listStatus: routesStatus } = useAppSelector((state) => state.transferRoutes);
   const { items: pricings, listStatus: pricingsStatus } = useAppSelector((state) => state.routePricings);
   const { items: locations, listStatus: locationsStatus } = useAppSelector((state) => state.locations);
+  const { items: categories } = useAppSelector((state) => state.vehicleCategories);
 
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [bookingLoadingId, setBookingLoadingId] = useState<number | null>(null);
+
+  const handleBookNow = async (pricing: RoutePricing) => {
+    if (!selectedRoute) return;
+
+    const category = categories.find((c) => c.name === pricing.vehicleCategoryName);
+    const categoryId = category?.id || 0;
+
+    if (!categoryId) {
+      alert("Could not determine vehicle category. Please try again later.");
+      return;
+    }
+
+    setBookingLoadingId(pricing.id);
+    dispatch(
+      setSelectedTransferRoute({
+        transferRouteId: selectedRoute.id,
+        vehicleCategoryId: categoryId,
+        journeySnapshot: {
+          vehicleName: pricing.vehicleCategoryName || "Standard Vehicle",
+          vehicleCapacity: 4,
+          vehicleCategoryName: pricing.vehicleCategoryName || "",
+          imageUrl: null,
+          fromLocation: selectedRoute.originLocationName || "",
+          toLocation: selectedRoute.destinationLocationName || "",
+        },
+      })
+    );
+
+    try {
+      await dispatch(calculatePrice(1)).unwrap();
+      router.push("/billing");
+    } catch (err) {
+      console.error(err);
+      alert("Could not calculate price. Please try again.");
+      setBookingLoadingId(null);
+    }
+  };
 
   // Hydrate auth first
   useEffect(() => {
@@ -47,6 +92,7 @@ export function OurRoutesPage() {
     dispatch(fetchTransferRoutes({ pageNumber: 1, pageSize: 100 }));
     dispatch(fetchRoutePricings({ pageNumber: 1, pageSize: 100 }));
     dispatch(fetchLocations({ pageNumber: 1, pageSize: 100 }));
+    dispatch(fetchVehicleCategories({ pageNumber: 1, pageSize: 100 }));
   }, [dispatch, hydrated]);
 
   const isLoading =
@@ -132,13 +178,13 @@ export function OurRoutesPage() {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 h-full">
           
           {/* Left Column: Route List */}
-          <div className="w-full lg:w-2/5 flex flex-col">
+          <div className="w-full lg:w-1/2 flex flex-col pr-4">
             <h2 className="text-xl font-bold text-transfer-dark mb-6 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-transfer-green" />
               Available Routes
             </h2>
             
-            <div className="flex-1 overflow-y-auto px-1 pb-6 space-y-4 max-h-[600px] lg:max-h-[800px] custom-scrollbar">
+            <div className="flex flex-col gap-5 py-2 px-2">
               {isLoading && !routesWithPricings.length ? (
                 <div className="py-12 flex justify-center">
                   <Loader2 className="w-8 h-8 animate-spin text-transfer-green" />
@@ -196,7 +242,7 @@ export function OurRoutesPage() {
           </div>
 
           {/* Right Column: Map & Pricing */}
-          <div className="w-full lg:w-3/5 flex flex-col gap-8">
+          <div className="w-full lg:w-1/2 flex flex-col gap-8 lg:sticky lg:top-24 self-start">
             {/* Map Container */}
             <div className="w-full h-[400px] lg:h-[500px] rounded-2xl relative shadow-md">
                <RouteMap origin={originCoords} destination={destinationCoords} />
@@ -238,10 +284,15 @@ export function OurRoutesPage() {
                           <span className="text-3xl font-black text-transfer-dark group-hover:text-transfer-green transition-colors duration-300">€{pricing.price}</span>
                         </div>
                         <button 
-                          className="px-6 py-3 rounded-xl font-bold text-sm bg-transfer-green text-white shadow-lg hover:bg-transfer-dark transition-colors"
-                          onClick={() => alert("Booking functionality for route pricings is under construction.")}
+                          className="px-6 py-3 rounded-xl font-bold text-sm bg-transfer-green text-white shadow-lg hover:bg-transfer-dark transition-colors flex items-center justify-center min-w-[120px]"
+                          onClick={() => handleBookNow(pricing)}
+                          disabled={bookingLoadingId === pricing.id}
                         >
-                          Book Now
+                          {bookingLoadingId === pricing.id ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            "Book Now"
+                          )}
                         </button>
                       </div>
                     </motion.div>
@@ -259,22 +310,7 @@ export function OurRoutesPage() {
         </div>
       </section>
 
-      {/* Custom Scrollbar Styles for the route list */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #cbd5e1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: #94a3b8;
-        }
-      `}} />
+
     </div>
   );
 }
