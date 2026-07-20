@@ -36,7 +36,7 @@ export default function LocationJourneysPage() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f6f8fb] text-transfer-dark">
+      <div className="flex min-h-screen items-center justify-center bg-[#fbfaf8] text-transfer-dark">
         <Loader2 className="mr-3 h-5 w-5 animate-spin text-transfer-green" />
         Preparing location journeys...
       </div>

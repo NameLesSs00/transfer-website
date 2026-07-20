@@ -29,7 +29,7 @@ export function BookNow() {
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: "rgba(163, 163, 163, 1)",
+          background: "rgba(14, 24, 33, 0.78)",
           mixBlendMode: "multiply",
         }}
       />
@@ -64,7 +64,7 @@ export function BookNow() {
           {/* CTA Button */}
           <motion.button
             onClick={handleBookNow}
-            className="bg-transfer-green text-white font-semibold text-sm md:text-base rounded-full px-8 py-3 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 self-start"
+            className="self-start rounded-full bg-white px-8 py-3 text-sm font-semibold text-transfer-dark shadow-[0_12px_30px_rgba(0,0,0,0.22)] transition-transform duration-200 hover:scale-105 hover:bg-transfer-light-green active:scale-95 md:text-base"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}

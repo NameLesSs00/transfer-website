@@ -22,7 +22,7 @@ function RouteAnimation() {
           y1="30"
           x2="180"
           y2="30"
-          stroke="#4d9f31"
+          stroke="#c48746"
           strokeWidth="3"
           strokeLinecap="round"
           initial={{ pathLength: 0, opacity: 0 }}
@@ -35,7 +35,7 @@ function RouteAnimation() {
           cx="20"
           cy="30"
           r="6"
-          fill="#4d9f31"
+          fill="#c48746"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.4, delay: 0.5 }}
@@ -62,7 +62,7 @@ function RouteAnimation() {
           cy="30"
           r="8"
           fill="#f9fffb"
-          stroke="#4d9f31"
+          stroke="#c48746"
           strokeWidth="2.5"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -71,7 +71,7 @@ function RouteAnimation() {
         <motion.text
           x="196"
           y="35"
-          fill="#4d9f31"
+          fill="#c48746"
           fontSize="11"
           fontWeight="700"
           initial={{ opacity: 0 }}
@@ -150,7 +150,7 @@ export default function NotFound() {
         className="absolute inset-0 opacity-[0.06] pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(circle, #4d9f31 1px, transparent 1px)",
+            "radial-gradient(circle, #c48746 1px, transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />

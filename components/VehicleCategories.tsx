@@ -82,7 +82,7 @@ export function VehicleCategories() {
   return (
     <section
       className="w-full py-16 md:py-24"
-      style={{ background: "rgba(0, 31, 72, 1)" }}
+      style={{ background: "rgba(14, 24, 33, 1)" }}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 flex flex-col gap-12">
 
@@ -102,7 +102,7 @@ export function VehicleCategories() {
             style={{
               width: "120px",
               height: "4px",
-              background: "rgba(180, 200, 220, 0.45)",
+              background: "rgba(251, 245, 240, 0.45)",
             }}
           />
         </motion.div>
@@ -129,7 +129,7 @@ export function VehicleCategories() {
                   style={{
                     width: "220px",
                     height: "200px",
-                    background: "rgba(120, 150, 185, 0.18)",
+                    background: "rgba(251, 245, 240, 0.18)",
                     filter: "blur(2px)",
                   }}
                 />
@@ -175,7 +175,7 @@ export function VehicleCategories() {
                     style={{
                       width: "180px",
                       height: "160px",
-                      background: "rgba(120, 150, 185, 0.18)",
+                      background: "rgba(251, 245, 240, 0.18)",
                       filter: "blur(2px)",
                     }}
                   />
@@ -212,7 +212,7 @@ export function VehicleCategories() {
                   height: "10px",
                   background:
                     activeIndex === index
-                      ? "#4d9f31"
+                      ? "#c48746"
                       : "rgba(255,255,255,0.35)",
                   border: "none",
                   cursor: "pointer",

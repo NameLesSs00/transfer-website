@@ -51,15 +51,19 @@ async function parseJson<T>(response: Response): Promise<T> {
   return payload;
 }
 
-function buildVehicleFormData(payload: CreateVehiclePayload) {
+function buildVehicleFormData(payload: CreateVehiclePayload | UpdateVehiclePayload) {
   const formData = new FormData();
+
+  if ("id" in payload) {
+    formData.set("Id", String(payload.id));
+  }
 
   formData.set("Name", payload.name);
   formData.set("Model", payload.model);
   formData.set("Year", String(payload.year));
   formData.set("LicensePlate", payload.licensePlate);
   formData.set("Capacity", String(payload.capacity));
-  formData.set("ImageUrl", payload.imageFile);
+  formData.set("ImageUrl", payload.imageFile ?? "");
   formData.set("IsActive", String(payload.isActive));
   formData.set("VehicleCategoryId", String(payload.vehicleCategoryId));
   formData.set("VehicleFactoryId", String(payload.vehicleFactoryId));
@@ -94,12 +98,22 @@ export async function createVehicleRequest(payload: CreateVehiclePayload, token:
   return parseJson<ApiResponse<Vehicle>>(response);
 }
 
-export function updateVehicleRequest(payload: UpdateVehiclePayload, token: string | null) {
-  return apiRequest<ApiResponse<Vehicle>>(`/Vehicles/${payload.id}`, {
+export async function updateVehicleRequest(payload: UpdateVehiclePayload, token: string | null) {
+  const headers = new Headers();
+
+  headers.set("accept", "*/*");
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(buildUrl(`/Vehicles/${payload.id}`), {
     method: "PUT",
-    body: payload,
-    token,
+    headers,
+    body: buildVehicleFormData(payload),
   });
+
+  return parseJson<ApiResponse<Vehicle>>(response);
 }
 
 export function deleteVehicleRequest(id: number, token: string | null) {

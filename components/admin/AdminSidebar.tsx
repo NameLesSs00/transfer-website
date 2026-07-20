@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeDollarSign, CarFront, Factory, LayoutDashboard, MapPin, MapPinned, Route, Tags, Users, X } from "lucide-react";
+import { BadgeDollarSign, CarFront, Factory, HelpCircle, LayoutDashboard, MapPin, MapPinned, Route, Tags, Users, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeAdminSidebar } from "@/store/features/ui/uiSlice";
@@ -17,6 +17,11 @@ const navigationItems = [
     href: "/admin/admins",
     icon: Users,
     label: "Admins",
+  },
+  {
+    href: "/admin/faqs",
+    icon: HelpCircle,
+    label: "FAQs",
   },
   {
     href: "/admin/vehicles",
@@ -53,6 +58,11 @@ const navigationItems = [
     icon: MapPinned,
     label: "Location Journeys",
   },
+  {
+    href: "/admin/per-journeys",
+    icon: BadgeDollarSign,
+    label: "Per Journeys",
+  },
 ];
 
 function SidebarContent() {
@@ -60,17 +70,17 @@ function SidebarContent() {
   const pathname = usePathname();
   const profile = useAppSelector((state) => state.auth.profile);
 
-  const activeClass = "bg-[#edf8f1] text-transfer-green";
+  const activeClass = "bg-[#fbf5f0] text-transfer-green";
   const inactiveClass = "text-[#667085] hover:bg-gray-50";
 
   return (
     <>
       <Image
         src="/Logo.png"
-        alt="Transfer website"
-        width={160}
-        height={45}
-        className="h-auto w-[150px]"
+        alt="Rubin Tours"
+        width={38}
+        height={49}
+        className="h-12 w-auto object-contain"
         priority
       />
 
@@ -96,7 +106,7 @@ function SidebarContent() {
         })}
       </nav>
 
-      <div className="mt-auto rounded-xl bg-[#f6f8fb] p-4">
+      <div className="mt-auto rounded-xl bg-[#fbfaf8] p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8a94a3]">
           Signed in as
         </p>

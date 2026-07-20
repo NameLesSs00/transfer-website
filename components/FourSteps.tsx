@@ -61,10 +61,7 @@ export function FourSteps() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center"
-            style={{ color: "rgba(77, 159, 49, 1)" }}
-          >
+          <h2 className="text-center text-3xl font-bold text-transfer-green md:text-4xl">
             Book Your Ride in 4 Simple Steps
           </h2>
           <div
@@ -72,7 +69,7 @@ export function FourSteps() {
             style={{
               width: "120px",
               height: "4px",
-              background: "rgba(77, 159, 49, 0.45)",
+              background: "rgba(251, 245, 240, 1)",
             }}
           />
         </motion.div>
@@ -89,8 +86,7 @@ export function FourSteps() {
             <motion.div
               key={step.title}
               variants={cardVariants}
-              className="flex flex-col items-center text-center gap-5 rounded-[24px] p-6 md:p-8"
-              style={{ background: "#ddf0d6" }}
+              className="flex flex-col items-center gap-5 rounded-[12px] bg-transfer-light-green p-6 text-center shadow-[0_1px_8px_rgba(14,24,33,0.05)] md:p-8"
             >
               {/* Icon */}
               <div className="relative w-16 h-16 flex-shrink-0">
@@ -106,7 +102,7 @@ export function FourSteps() {
               {/* Title */}
               <h3
                 className="text-base md:text-lg font-semibold leading-snug"
-                style={{ color: "rgba(77, 159, 49, 1)" }}
+                style={{ color: "rgba(196, 135, 70, 1)" }}
               >
                 {step.title}
               </h3>

@@ -35,16 +35,16 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f6f8fb] px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-[#fbfaf8] px-4 py-10">
       <div className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_18px_70px_rgba(15,23,42,0.10)] lg:grid-cols-[0.95fr_1.05fr]">
         <section className="hidden bg-transfer-dark p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div>
             <Image
-              src="/LogoFooter.png"
-              alt="Transfer website"
-              width={180}
-              height={52}
-              className="h-auto w-[170px]"
+              src="/logoFotter.png"
+              alt="Rubin Tours"
+              width={58}
+              height={75}
+              className="h-24 w-auto object-contain"
               priority
             />
           </div>
@@ -67,10 +67,10 @@ export default function AdminLoginPage() {
           <div className="mb-10 lg:hidden">
             <Image
               src="/Logo.png"
-              alt="Transfer website"
-              width={160}
-              height={45}
-              className="h-auto w-[150px]"
+              alt="Rubin Tours"
+              width={38}
+              height={49}
+              className="h-14 w-auto object-contain"
               priority
             />
           </div>
@@ -135,7 +135,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loginStatus === "loading"}
-              className="mt-2 flex h-12 items-center justify-center rounded-xl bg-transfer-green px-5 text-base font-bold text-white shadow-[0_8px_24px_rgba(77,159,49,0.22)] transition-colors hover:bg-[#3d8525] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex h-12 items-center justify-center rounded-xl bg-transfer-green px-5 text-base font-bold text-white shadow-[0_8px_24px_rgba(196,135,70,0.22)] transition-colors hover:bg-[#ad743a] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loginStatus === "loading" ? "Signing in..." : "Sign In"}
             </button>

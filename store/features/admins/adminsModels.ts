@@ -24,12 +24,6 @@ export type AddAdminPayload = {
   password: string;
 };
 
-export type UpdateAdminPayload = {
-  userName: string;
-  email: string;
-  phoneNumber: string;
-};
-
 export type AdminsState = {
   items: AdminUser[];
   pageNumber: number;
@@ -38,7 +32,6 @@ export type AdminsState = {
   totalRecords: number;
   listStatus: "idle" | "loading" | "succeeded" | "failed";
   addStatus: "idle" | "loading" | "succeeded" | "failed";
-  updateStatus: "idle" | "loading" | "succeeded" | "failed";
   deleteStatus: "idle" | "loading" | "succeeded" | "failed";
   deletingAdminId: string | null;
   isAddAdminOpen: boolean;

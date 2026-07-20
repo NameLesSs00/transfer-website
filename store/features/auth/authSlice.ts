@@ -39,12 +39,10 @@ export const loginAdmin = createAsyncThunk<AuthSession, LoginRequest>(
 export const logoutAdmin = createAsyncThunk<void, void, { state: RootState }>(
   "auth/logoutAdmin",
   async (_, { getState }) => {
-    const { refreshToken, accessToken } = getState().auth;
+    const { accessToken } = getState().auth;
 
     try {
-      if (refreshToken) {
-        await logoutRequest(refreshToken, accessToken);
-      }
+      await logoutRequest(accessToken);
     } finally {
       clearStoredAuthSession();
     }
@@ -54,10 +52,9 @@ export const logoutAdmin = createAsyncThunk<void, void, { state: RootState }>(
 export const refreshAdminToken = createAsyncThunk<AuthSession, void, { state: RootState }>(
   "auth/refreshAdminToken",
   async (_, { getState }) => {
-    const { refreshToken, accessToken } = getState().auth;
-    if (!refreshToken) throw new Error("Missing refresh token");
+    const { accessToken } = getState().auth;
 
-    const session = await refreshTokenRequest(refreshToken, accessToken);
+    const session = await refreshTokenRequest(accessToken);
     storeAuthSession(session);
     return session;
   }
@@ -68,8 +65,8 @@ export const updateAdminPassword = createAsyncThunk<
   UpdatePasswordPayload,
   { state: RootState }
 >("auth/updateAdminPassword", async (payload, { getState }) => {
-  const response = await updatePasswordRequest(payload, getState().auth.accessToken);
-  return response.message || "Password updated successfully";
+  await updatePasswordRequest(payload, getState().auth.accessToken);
+  return "Password updated successfully";
 });
 
 const authSlice = createSlice({
@@ -103,6 +100,12 @@ const authSlice = createSlice({
         email: action.payload.email,
         fullName: action.payload.fullName,
       };
+    },
+    clearAuthSession(state) {
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.profile = null;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -164,7 +167,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError, clearAuthNotice, hydrateAuth, setAuthSession } =
+export const { clearAuthError, clearAuthNotice, clearAuthSession, hydrateAuth, setAuthSession } =
   authSlice.actions;
 
 export const authReducer = authSlice.reducer;

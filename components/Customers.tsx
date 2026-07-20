@@ -60,7 +60,7 @@ function ReviewCard({
     <div
       className="flex flex-col gap-4 rounded-[24px] p-6 md:p-8 h-full"
       style={{
-        background: isActive ? "#ffffff" : "#ddf0d6",
+        background: isActive ? "#ffffff" : "#fbf5f0",
         minHeight: "280px",
       }}
     >
@@ -148,7 +148,7 @@ export function Customers() {
   return (
     <section
       className="w-full py-16 md:py-24 px-6 md:px-12 lg:px-16"
-      style={{ background: "rgba(0, 31, 72, 1)" }}
+      style={{ background: "rgba(14, 24, 33, 1)" }}
     >
       <div className="max-w-7xl mx-auto flex flex-col gap-12">
 
@@ -168,7 +168,7 @@ export function Customers() {
             style={{
               width: "120px",
               height: "4px",
-              background: "rgba(180, 200, 220, 0.45)",
+              background: "rgba(251, 245, 240, 0.45)",
             }}
           />
         </motion.div>
@@ -244,7 +244,7 @@ export function Customers() {
                   height: "10px",
                   background:
                     mobileActive === index
-                      ? "#4d9f31"
+                      ? "#c48746"
                       : "rgba(255,255,255,0.35)",
                   border: "none",
                   cursor: "pointer",

@@ -24,7 +24,7 @@ type LocationSummaryProps = {
 function LocationSummary({ label, location, name }: LocationSummaryProps) {
   return (
     <div className="flex min-w-0 gap-3">
-      <span className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#edf8f1] text-transfer-green">
+      <span className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#fbf5f0] text-transfer-green">
         <MapPin className="h-4 w-4" />
       </span>
       <div className="min-w-0">
@@ -86,9 +86,9 @@ export function TransferRoutesTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-x-auto">
         <table className="w-full min-w-[1080px] text-left">
-          <thead className="bg-[#f8fafb] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
+          <thead className="bg-[#fbfaf8] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
             <tr>
               <th className="px-5 py-4">Route</th>
               <th className="px-5 py-4">Origin</th>
@@ -122,7 +122,7 @@ export function TransferRoutesTable() {
                   <tr key={route.id} className="text-sm font-medium text-transfer-dark">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#edf8f1] text-transfer-green">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf5f0] text-transfer-green">
                           <Route className="h-5 w-5" />
                         </span>
                         <div className="min-w-0">
@@ -151,7 +151,7 @@ export function TransferRoutesTable() {
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
                           route.isActive
-                            ? "bg-[#edf8f1] text-transfer-green"
+                            ? "bg-[#fbf5f0] text-transfer-green"
                             : "bg-gray-100 text-[#667085]"
                         }`}
                       >

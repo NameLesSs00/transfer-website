@@ -5,7 +5,7 @@ export type LoginRequest = {
 
 export type AuthSession = {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
   email: string;
   fullName: string;
 };
@@ -23,7 +23,7 @@ export type UpdatePasswordPayload = {
 
 export type AuthState = {
   accessToken: string | null;
-  refreshToken: string | null;
+  refreshToken?: string | null;
   profile: AdminProfile | null;
   hydrated: boolean;
   loginStatus: "idle" | "loading" | "succeeded" | "failed";

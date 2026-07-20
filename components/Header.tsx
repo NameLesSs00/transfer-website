@@ -31,13 +31,13 @@ export function Header() {
       >
         {/* Logo */}
         <div className="flex-shrink-0">
-          <Link href="/">
+          <Link href="/" className="flex h-16 items-center">
             <Image 
               src="/Logo.png" 
-              alt="Logoipsum" 
-              width={160} 
-              height={45} 
-              className="w-[140px] md:w-[160px] h-auto"
+              alt="Rubin Tours" 
+              width={38} 
+              height={49} 
+              className="h-12 w-auto object-contain md:h-14"
               priority
             />
           </Link>
@@ -51,13 +51,13 @@ export function Header() {
               <Link 
                 key={link.name} 
                 href={link.href} 
-                className={`relative pb-1 transition-colors ${isActive ? "text-transfer-green font-medium" : "text-transfer-gray hover:text-transfer-green"}`}
+                className={`relative pb-1 transition-colors ${isActive ? "text-transfer-dark font-semibold" : "text-transfer-gray hover:text-transfer-dark"}`}
               >
                 {link.name}
                 {isActive && (
                   <motion.span 
                     layoutId="underline"
-                    className="absolute left-0 bottom-0 w-full h-[2px] bg-transfer-green"
+                    className="absolute left-0 bottom-0 w-full h-[2px] bg-transfer-dark"
                   ></motion.span>
                 )}
               </Link>
@@ -78,7 +78,7 @@ export function Header() {
 
         {/* Mobile Hamburger Menu */}
         <button 
-          className="lg:hidden flex items-center justify-center p-2 text-transfer-green hover:bg-green-50 rounded-lg transition-colors"
+          className="flex items-center justify-center rounded-lg p-2 text-transfer-green transition-colors hover:bg-transfer-light-green lg:hidden"
           onClick={() => setIsMobileMenuOpen(true)}
         >
           <Menu className="w-8 h-8" />

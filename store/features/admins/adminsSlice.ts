@@ -4,13 +4,11 @@ import {
   addAdminRequest,
   deleteAdminRequest,
   getAdminsRequest,
-  updateAdminRequest,
 } from "./adminsApi";
 import {
   AddAdminPayload,
   AdminsResponse,
   AdminsState,
-  UpdateAdminPayload,
 } from "./adminsModels";
 
 const initialState: AdminsState = {
@@ -21,7 +19,6 @@ const initialState: AdminsState = {
   totalRecords: 0,
   listStatus: "idle",
   addStatus: "idle",
-  updateStatus: "idle",
   deleteStatus: "idle",
   deletingAdminId: null,
   isAddAdminOpen: false,
@@ -45,27 +42,18 @@ export const fetchAdmins = createAsyncThunk<
 export const createAdmin = createAsyncThunk<string, AddAdminPayload, { state: RootState }>(
   "admins/createAdmin",
   async (payload, { getState }) => {
-    const response = await addAdminRequest(payload, getState().auth.accessToken);
-    return response.message || "Admin added successfully";
+    await addAdminRequest(payload, getState().auth.accessToken);
+    return "Admin added successfully";
   }
 );
-
-export const saveAdminProfile = createAsyncThunk<
-  string,
-  UpdateAdminPayload,
-  { state: RootState }
->("admins/saveAdminProfile", async (payload, { getState }) => {
-  const response = await updateAdminRequest(payload, getState().auth.accessToken);
-  return response.message || "Profile updated successfully";
-});
 
 export const removeAdmin = createAsyncThunk<
   string,
   { id: string; email: string },
   { state: RootState }
 >("admins/removeAdmin", async ({ id }, { getState }) => {
-  const response = await deleteAdminRequest(id, getState().auth.accessToken);
-  return response.message || "Admin deleted successfully";
+  await deleteAdminRequest(id, getState().auth.accessToken);
+  return "Admin deleted successfully";
 });
 
 const adminsSlice = createSlice({
@@ -92,12 +80,15 @@ const adminsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAdmins.fulfilled, (state, action) => {
+        const requestedPageSize = action.meta.arg.pageSize ?? state.pageSize;
+        const totalRecords = action.payload.totalRecords ?? action.payload.data?.length ?? 0;
+
         state.listStatus = "succeeded";
         state.items = action.payload.data ?? [];
-        state.pageNumber = action.payload.pageNumber || state.pageNumber;
-        state.pageSize = action.payload.pageSize || state.pageSize;
-        state.totalPages = action.payload.totalPages || 1;
-        state.totalRecords = action.payload.totalRecords || action.payload.data?.length || 0;
+        state.pageNumber = action.meta.arg.pageNumber;
+        state.pageSize = requestedPageSize;
+        state.totalPages = Math.max(1, Math.ceil(totalRecords / requestedPageSize));
+        state.totalRecords = totalRecords;
       })
       .addCase(fetchAdmins.rejected, (state, action) => {
         state.listStatus = "failed";
@@ -116,19 +107,6 @@ const adminsSlice = createSlice({
       .addCase(createAdmin.rejected, (state, action) => {
         state.addStatus = "failed";
         state.error = getErrorMessage(action.error, "Unable to add admin");
-      })
-      .addCase(saveAdminProfile.pending, (state) => {
-        state.updateStatus = "loading";
-        state.error = null;
-        state.notice = null;
-      })
-      .addCase(saveAdminProfile.fulfilled, (state, action) => {
-        state.updateStatus = "succeeded";
-        state.notice = action.payload;
-      })
-      .addCase(saveAdminProfile.rejected, (state, action) => {
-        state.updateStatus = "failed";
-        state.error = getErrorMessage(action.error, "Unable to update profile");
       })
       .addCase(removeAdmin.pending, (state, action) => {
         state.deleteStatus = "loading";

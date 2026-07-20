@@ -41,9 +41,9 @@ export function VehiclesTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-x-auto">
         <table className="w-full min-w-[1080px] text-left">
-          <thead className="bg-[#f8fafb] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
+          <thead className="bg-[#fbfaf8] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
             <tr>
               <th className="px-5 py-4">Vehicle</th>
               <th className="px-5 py-4">Model / Year</th>
@@ -77,7 +77,7 @@ export function VehiclesTable() {
                   <tr key={vehicle.id} className="text-sm font-medium text-transfer-dark">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-12 w-16 items-center justify-center overflow-hidden rounded-lg bg-[#edf8f1] text-transfer-green">
+                        <span className="flex h-12 w-16 items-center justify-center overflow-hidden rounded-lg bg-[#fbf5f0] text-transfer-green">
                           {imageUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -98,7 +98,7 @@ export function VehiclesTable() {
                     <td className="px-5 py-4 text-[#667085]">{vehicle.licensePlate}</td>
                     <td className="px-5 py-4 text-[#667085]">{vehicle.capacity}</td>
                     <td className="px-5 py-4">
-                      <span className="inline-flex rounded-full bg-[#edf8f1] px-3 py-1 text-xs font-bold text-transfer-green">
+                      <span className="inline-flex rounded-full bg-[#fbf5f0] px-3 py-1 text-xs font-bold text-transfer-green">
                         {getVehicleCategoryLabel(vehicle)}
                       </span>
                     </td>
@@ -107,7 +107,7 @@ export function VehiclesTable() {
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
                           vehicle.isActive
-                            ? "bg-[#edf8f1] text-transfer-green"
+                            ? "bg-[#fbf5f0] text-transfer-green"
                             : "bg-gray-100 text-[#667085]"
                         }`}
                       >

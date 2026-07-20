@@ -116,6 +116,12 @@ const quickLinks = [
     icon: MapPinned,
     label: "Location Journeys",
   },
+  {
+    description: "Set vehicle prices between location journeys.",
+    href: "/admin/per-journeys",
+    icon: BadgeDollarSign,
+    label: "Per Journeys",
+  },
 ];
 
 function formatNumber(value: number) {
@@ -143,7 +149,7 @@ type SummaryCardProps = {
 function SummaryCard({ icon: Icon, label, value }: SummaryCardProps) {
   return (
     <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-[0_1px_8px_rgba(15,23,42,0.04)]">
-      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#edf8f1] text-transfer-green">
+      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#fbf5f0] text-transfer-green">
         <Icon className="h-5 w-5" />
       </span>
       <p className="mt-5 text-sm font-semibold text-[#667085]">{label}</p>
@@ -192,7 +198,7 @@ export default function AdminDashboardPage() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f6f8fb] text-transfer-dark">
+      <div className="flex min-h-screen items-center justify-center bg-[#fbfaf8] text-transfer-dark">
         <Loader2 className="mr-3 h-5 w-5 animate-spin text-transfer-green" />
         Checking admin session...
       </div>
@@ -317,7 +323,7 @@ export default function AdminDashboardPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-lg border border-gray-100 p-4 transition-colors hover:border-transfer-green/30 hover:bg-[#fbfefc]"
+                  className="rounded-lg border border-gray-100 p-4 transition-colors hover:border-transfer-green/30 hover:bg-[#fbf5f0]"
                 >
                   <Icon className="h-6 w-6 text-transfer-green" />
                   <h3 className="mt-3 text-base font-bold text-transfer-dark">{item.label}</h3>

@@ -1,3 +1,6 @@
+import { clearStoredAuthSession, getStoredAccessToken, storeAuthSession } from "./authStorage";
+import { shouldRefreshAccessToken } from "./authTokens";
+
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_TRANSFER_API_URL ?? "https://transfer.tryasp.net/api";
 
@@ -11,6 +14,12 @@ export type ApiResponse<T> = {
 type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
   token?: string | null;
+};
+
+type RefreshSession = {
+  accessToken: string;
+  email: string;
+  fullName: string;
 };
 
 function buildUrl(path: string) {
@@ -37,14 +46,85 @@ async function parseJson<T>(response: Response): Promise<T> {
   return payload;
 }
 
-export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}) {
+let refreshPromise: Promise<RefreshSession> | null = null;
+
+function isBrowser() {
+  return typeof window !== "undefined";
+}
+
+function notifyLoggedOut() {
+  if (!isBrowser()) return;
+
+  clearStoredAuthSession();
+  window.dispatchEvent(new CustomEvent("transfer:auth:logout"));
+}
+
+async function refreshAccessToken(currentAccessToken?: string | null) {
+  const headers = new Headers();
+
+  if (currentAccessToken) {
+    headers.set("Authorization", `Bearer ${currentAccessToken}`);
+  }
+
+  const response = await fetch("/api/auth/refresh-token", {
+    method: "POST",
+    headers,
+    credentials: "same-origin",
+  });
+  const data = await response.json();
+
+  if (!response.ok || !data.success || !data.data?.accessToken) {
+    throw new Error(data.message || "Token refresh failed");
+  }
+
+  const session = data.data as RefreshSession;
+  storeAuthSession(session);
+  window.dispatchEvent(new CustomEvent("transfer:auth:refresh", { detail: session }));
+
+  return session;
+}
+
+function getRefreshPromise(currentAccessToken?: string | null) {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken(currentAccessToken).finally(() => {
+      refreshPromise = null;
+    });
+  }
+
+  return refreshPromise;
+}
+
+async function resolveAccessToken(token?: string | null) {
+  if (!isBrowser()) return token ?? null;
+
+  const currentToken = token ?? getStoredAccessToken();
+
+  if (currentToken && !shouldRefreshAccessToken(currentToken)) {
+    return currentToken;
+  }
+
+  try {
+    const session = await getRefreshPromise(currentToken);
+    return session.accessToken;
+  } catch (error) {
+    if (!currentToken || shouldRefreshAccessToken(currentToken)) {
+      notifyLoggedOut();
+      throw error;
+    }
+
+    return currentToken;
+  }
+}
+
+export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { body, token, headers: initialHeaders, ...init } = options;
   const headers = new Headers(initialHeaders);
+  const accessToken = await resolveAccessToken(token);
 
   headers.set("accept", "*/*");
 
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
   if (body !== undefined && !headers.has("Content-Type")) {
@@ -56,6 +136,23 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+
+  if (response.status === 401 && isBrowser()) {
+    try {
+      const session = await getRefreshPromise(accessToken);
+      headers.set("Authorization", `Bearer ${session.accessToken}`);
+
+      const retryResponse = await fetch(buildUrl(path), {
+        ...init,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+      return parseJson<T>(retryResponse);
+    } catch (error) {
+      notifyLoggedOut();
+      throw error;
+    }
+  }
 
   return parseJson<T>(response);
 }

@@ -98,7 +98,7 @@ function RoutePricingFormModalContent() {
       transferRouteId,
       vehicleCategoryId,
       price,
-      isActive: form.isActive,
+      isActive: isEditing ? form.isActive : true,
     };
 
     const result =
@@ -186,21 +186,21 @@ function RoutePricingFormModalContent() {
             />
           </label>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Status</span>
-            <select
-              value={form.isActive ? "active" : "inactive"}
-              onChange={(event) => updateField("isActive", event.target.value === "active")}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm font-medium outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </label>
+          {isEditing && (
+            <label className="flex h-11 items-center gap-3 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-transfer-dark">
+              <input
+                type="checkbox"
+                checked={form.isActive}
+                onChange={(event) => updateField("isActive", event.target.checked)}
+                className="h-4 w-4 accent-transfer-green"
+              />
+              Active
+            </label>
+          )}
 
           <button
             disabled={isSubmitting || !canSubmit}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />

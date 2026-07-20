@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { Loader2, Route, Save } from "lucide-react";
+import { FormEvent, useMemo, useState } from "react";
+import { Check, ChevronsUpDown, Loader2, Route, Save, Search } from "lucide-react";
+import { Location } from "@/store/features/locations/locationsModels";
 import {
   closeTransferRouteModal,
   createTransferRoute,
@@ -15,6 +16,121 @@ type TransferRouteFormState = {
   destinationLocationId: string;
   isActive: boolean;
 };
+
+type LocationField = "originLocationId" | "destinationLocationId";
+
+type LocationSelectProps = {
+  disabled: boolean;
+  label: string;
+  loadingLabel: string;
+  locations: Location[];
+  name: LocationField;
+  onChange: (name: LocationField, value: string) => void;
+  open: boolean;
+  query: string;
+  selectedId: string;
+  setOpen: (name: LocationField | null) => void;
+  setQuery: (value: string) => void;
+};
+
+function getLocationLabel(location: Location) {
+  return `${location.name} - ${location.address}`;
+}
+
+function LocationSelect({
+  disabled,
+  label,
+  loadingLabel,
+  locations,
+  name,
+  onChange,
+  open,
+  query,
+  selectedId,
+  setOpen,
+  setQuery,
+}: LocationSelectProps) {
+  const selectedLocation = locations.find((location) => String(location.id) === selectedId);
+  const filteredLocations = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return locations;
+
+    return locations.filter((location) =>
+      getLocationLabel(location).toLowerCase().includes(normalizedQuery)
+    );
+  }, [locations, query]);
+
+  return (
+    <div className="min-w-0 flex flex-col gap-2">
+      <span className="text-sm font-semibold text-transfer-dark">{label}</span>
+      <button
+        type="button"
+        onClick={() => setOpen(open ? null : name)}
+        disabled={disabled}
+        className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-sm font-medium text-transfer-dark outline-none transition-colors hover:bg-gray-50 focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <span className="min-w-0 flex-1 overflow-hidden break-words line-clamp-2">
+          {disabled
+            ? loadingLabel
+            : selectedLocation
+              ? getLocationLabel(selectedLocation)
+              : `Select ${label.toLowerCase()}`}
+        </span>
+        <ChevronsUpDown className="h-4 w-4 shrink-0 text-[#98a2b3]" />
+      </button>
+
+      {open && (
+        <div className="w-full min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_12px_30px_rgba(15,23,42,0.10)]">
+          <label className="flex h-11 items-center gap-2 border-b border-gray-100 px-3">
+            <Search className="h-4 w-4 text-[#98a2b3]" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search locations"
+              className="min-w-0 flex-1 text-sm font-medium text-transfer-dark outline-none placeholder:text-[#98a2b3]"
+            />
+          </label>
+
+          <div className="max-h-64 overflow-y-auto py-1">
+            {filteredLocations.length === 0 ? (
+              <div className="px-3 py-3 text-sm font-medium text-[#667085]">
+                No locations found.
+              </div>
+            ) : (
+              filteredLocations.map((location) => {
+                const value = String(location.id);
+                const isSelected = selectedId === value;
+
+                return (
+                  <button
+                    key={location.id}
+                    type="button"
+                    onClick={() => {
+                      onChange(name, value);
+                      setOpen(null);
+                      setQuery("");
+                    }}
+                    className="flex w-full min-w-0 items-start gap-3 px-3 py-2 text-left text-sm font-medium text-transfer-dark hover:bg-[#fbfaf8]"
+                  >
+                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
+                      {isSelected && <Check className="h-4 w-4 text-transfer-green" />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block break-words font-bold">{location.name}</span>
+                      <span className="mt-0.5 block overflow-hidden break-all text-xs font-medium leading-5 text-[#667085] line-clamp-2">
+                        {location.address}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function TransferRouteFormModal() {
   const { formMode, isFormModalOpen, selectedRoute } = useAppSelector(
@@ -39,6 +155,10 @@ function TransferRouteFormModalContent() {
   } = useAppSelector((state) => state.transferRoutes);
   const isEditing = formMode === "edit";
   const isSubmitting = createStatus === "loading" || updateStatus === "loading";
+  const isLoadingLocations = locationOptionsStatus === "loading";
+  const [openLocationField, setOpenLocationField] = useState<LocationField | null>(null);
+  const [originQuery, setOriginQuery] = useState("");
+  const [destinationQuery, setDestinationQuery] = useState("");
   const [form, setForm] = useState<TransferRouteFormState>({
     originLocationId: selectedRoute?.originLocationId
       ? String(selectedRoute.originLocationId)
@@ -77,7 +197,7 @@ function TransferRouteFormModalContent() {
     const payload = {
       originLocationId,
       destinationLocationId,
-      isActive: form.isActive,
+      isActive: isEditing ? form.isActive : true,
     };
 
     const result =
@@ -91,8 +211,8 @@ function TransferRouteFormModalContent() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4">
-      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-[0_18px_70px_rgba(15,23,42,0.18)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/35 px-4 py-6">
+      <section className="max-h-[92vh] w-full max-w-2xl overflow-y-auto overflow-x-hidden rounded-2xl bg-white p-6 shadow-[0_18px_70px_rgba(15,23,42,0.18)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-transfer-dark">
@@ -110,44 +230,34 @@ function TransferRouteFormModalContent() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 grid gap-4">
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Origin Location</span>
-            <select
-              value={form.originLocationId}
-              onChange={(event) => updateField("originLocationId", event.target.value)}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm font-medium outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
-              required
-            >
-              <option value="">
-                {locationOptionsStatus === "loading" ? "Loading locations..." : "Select origin"}
-              </option>
-              {locationOptions.map((location) => (
-                <option key={location.id} value={location.id}>
-                  {location.name} - {location.address}
-                </option>
-              ))}
-            </select>
-          </label>
+        <form onSubmit={handleSubmit} className="mt-6 grid min-w-0 gap-4">
+          <LocationSelect
+            disabled={isLoadingLocations}
+            label="Origin Location"
+            loadingLabel="Loading locations..."
+            locations={locationOptions}
+            name="originLocationId"
+            onChange={updateField}
+            open={openLocationField === "originLocationId"}
+            query={originQuery}
+            selectedId={form.originLocationId}
+            setOpen={setOpenLocationField}
+            setQuery={setOriginQuery}
+          />
 
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Destination Location</span>
-            <select
-              value={form.destinationLocationId}
-              onChange={(event) => updateField("destinationLocationId", event.target.value)}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm font-medium outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
-              required
-            >
-              <option value="">
-                {locationOptionsStatus === "loading" ? "Loading locations..." : "Select destination"}
-              </option>
-              {locationOptions.map((location) => (
-                <option key={location.id} value={location.id}>
-                  {location.name} - {location.address}
-                </option>
-              ))}
-            </select>
-          </label>
+          <LocationSelect
+            disabled={isLoadingLocations}
+            label="Destination Location"
+            loadingLabel="Loading locations..."
+            locations={locationOptions}
+            name="destinationLocationId"
+            onChange={updateField}
+            open={openLocationField === "destinationLocationId"}
+            query={destinationQuery}
+            selectedId={form.destinationLocationId}
+            setOpen={setOpenLocationField}
+            setQuery={setDestinationQuery}
+          />
 
           {hasSameLocation && (
             <p className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
@@ -155,21 +265,21 @@ function TransferRouteFormModalContent() {
             </p>
           )}
 
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Status</span>
-            <select
-              value={form.isActive ? "active" : "inactive"}
-              onChange={(event) => updateField("isActive", event.target.value === "active")}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm font-medium outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </label>
+          {isEditing && (
+            <label className="flex h-11 items-center gap-3 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-transfer-dark">
+              <input
+                type="checkbox"
+                checked={form.isActive}
+                onChange={(event) => updateField("isActive", event.target.checked)}
+                className="h-4 w-4 accent-transfer-green"
+              />
+              Active
+            </label>
+          )}
 
           <button
             disabled={isSubmitting || !canSubmit}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />

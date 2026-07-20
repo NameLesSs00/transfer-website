@@ -20,10 +20,13 @@ export function Hero() {
         />
       </div>
       
-      {/* Multiply Gradient Overlay */}
+      {/* Charcoal overlay */}
       <div 
         className="absolute inset-0 z-10 mix-blend-multiply"
-        style={{ background: "linear-gradient(270deg, #7E7E7E 0%, #737373 100%)" }}
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(14,24,33,0.88) 0%, rgba(14,24,33,0.58) 48%, rgba(14,24,33,0.34) 100%)",
+        }}
       ></div>
 
       {/* Content Container */}
@@ -65,15 +68,15 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex items-center gap-2 bg-transfer-green/90 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 shadow-lg">
+            <div className="flex items-center gap-2 rounded-full border border-white/15 bg-transfer-green px-4 py-2 shadow-lg">
               <Clock className="w-4 h-4 text-white" />
               <span className="text-sm font-medium text-white">24/7 Support</span>
             </div>
-            <div className="flex items-center gap-2 bg-transfer-green/90 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 shadow-lg">
+            <div className="flex items-center gap-2 rounded-full border border-white/15 bg-transfer-green px-4 py-2 shadow-lg">
               <Banknote className="w-4 h-4 text-white" />
               <span className="text-sm font-medium text-white">Pay cash</span>
             </div>
-            <div className="flex items-center gap-2 bg-transfer-green/90 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 shadow-lg">
+            <div className="flex items-center gap-2 rounded-full border border-white/15 bg-transfer-green px-4 py-2 shadow-lg">
               <UserCheck className="w-4 h-4 text-white" />
               <span className="text-sm font-medium text-white">Professional Drivers</span>
             </div>

@@ -89,8 +89,8 @@ export function OurFleet() {
               onClick={() => setActiveFilter(filter)}
               className={`flex-none snap-center px-8 py-3 rounded-full font-medium text-sm md:text-base transition-all duration-300 ${
                 activeFilter === filter
-                  ? "bg-transfer-green text-white shadow-md"
-                  : "bg-white text-transfer-dark border border-gray-200 hover:border-transfer-green"
+                  ? "bg-transfer-dark text-white shadow-md"
+                  : "border border-gray-300 bg-white text-transfer-dark hover:border-transfer-dark"
               }`}
             >
               {filter}
@@ -175,7 +175,7 @@ export function OurFleet() {
                 </div>
 
                 {/* Book Now Button */}
-                <Link href="/billing" className="w-full bg-transfer-green text-white font-bold text-base py-4 rounded-full hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 shadow-md hover:shadow-lg mt-2 text-center">
+                <Link href="/billing" className="mt-2 w-full rounded-full bg-transfer-dark py-4 text-center text-base font-bold text-white shadow-md transition-transform duration-200 hover:scale-[1.02] hover:bg-[#182634] hover:shadow-lg active:scale-[0.98]">
                   Book Now
                 </Link>
 
@@ -198,7 +198,7 @@ export function OurFleet() {
           <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-transfer-dark hover:bg-gray-50 transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button className="w-10 h-10 rounded-full bg-transfer-green text-white font-medium flex items-center justify-center shadow-sm">
+          <button className="w-10 h-10 rounded-full bg-transfer-dark text-white font-medium flex items-center justify-center shadow-sm">
             1
           </button>
           <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-transfer-dark hover:bg-gray-50 transition-colors font-medium">

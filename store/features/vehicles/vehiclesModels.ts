@@ -63,7 +63,7 @@ export type UpdateVehiclePayload = {
   year: number;
   licensePlate: string;
   capacity: number;
-  imageUrl: string;
+  imageFile?: File | null;
   isActive: boolean;
   vehicleCategoryId: number;
   vehicleFactoryId: number;

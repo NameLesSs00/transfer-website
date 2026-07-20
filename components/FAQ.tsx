@@ -46,10 +46,7 @@ export function FAQ() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h2
-            className="text-3xl md:text-4xl font-bold text-center"
-            style={{ color: "rgba(77, 159, 49, 1)" }}
-          >
+          <h2 className="text-center text-3xl font-bold text-transfer-green md:text-4xl">
             FAQ
           </h2>
           <div
@@ -57,7 +54,7 @@ export function FAQ() {
             style={{
               width: "120px",
               height: "4px",
-              background: "#ddf0d6",
+              background: "#fbf5f0",
             }}
           />
         </motion.div>
@@ -76,7 +73,7 @@ export function FAQ() {
               <div
                 key={faq.question}
                 className="rounded-2xl overflow-hidden"
-                style={{ background: "#F0F4F8" }}
+                style={{ background: "#fbf5f0" }}
               >
                 {/* Question row */}
                 <button

@@ -36,12 +36,12 @@ export function LocationJourneysTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left">
-          <thead className="bg-[#f8fafb] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
+      <div className="flex-1 overflow-x-auto">
+        <table className="w-full min-w-[720px] text-left">
+          <thead className="bg-[#fbfaf8] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
             <tr>
+              <th className="px-5 py-4">ID</th>
               <th className="px-5 py-4">Journey Name</th>
-              <th className="px-5 py-4">Status</th>
               <th className="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
@@ -62,18 +62,14 @@ export function LocationJourneysTable() {
             ) : (
               items.map((journey) => (
                 <tr key={journey.id} className="text-sm font-medium text-transfer-dark">
+                  <td className="px-5 py-4 text-[#667085]">#{journey.id}</td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#edf8f1] font-bold text-transfer-green">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf5f0] font-bold text-transfer-green">
                         <MapPin className="h-5 w-5" />
                       </span>
-                      <span className="font-bold">{journey.name}</span>
+                      <span className="font-bold">{journey.name || "Unnamed journey"}</span>
                     </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="inline-flex rounded-full bg-[#edf8f1] px-3 py-1 text-xs font-bold text-transfer-green">
-                      Active
-                    </span>
                   </td>
                   <td className="px-5 py-4 text-right">
                     <div className="inline-flex items-center gap-2">

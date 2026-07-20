@@ -4,8 +4,10 @@ import { LogOut, Menu, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { openAddAdminModal } from "@/store/features/admins/adminsSlice";
 import { logoutAdmin } from "@/store/features/auth/authSlice";
+import { openCreateFaqModal } from "@/store/features/faqs/faqsSlice";
 import { openCreateLocationJourneyModal } from "@/store/features/locationJourneys/locationJourneysSlice";
 import { openCreateLocationModal } from "@/store/features/locations/locationsSlice";
+import { openCreatePerJourneyModal } from "@/store/features/perJourneys/perJourneysSlice";
 import { openCreateRoutePricingModal } from "@/store/features/routePricings/routePricingsSlice";
 import { openCreateTransferRouteModal } from "@/store/features/transferRoutes/transferRoutesSlice";
 import { openAdminSidebar } from "@/store/features/ui/uiSlice";
@@ -17,9 +19,11 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 type AdminPageAction =
   | "addAdmin"
   | "addCategory"
+  | "addFaq"
   | "addFactory"
   | "addJourney"
   | "addLocation"
+  | "addPerJourney"
   | "addRoutePricing"
   | "addTransferRoute"
   | "addVehicle";
@@ -36,6 +40,15 @@ function getPageConfig(pathname: string): {
       addLabel: "Add Admin",
       eyebrow: "Access Management",
       title: "Admins",
+    };
+  }
+
+  if (pathname.startsWith("/admin/faqs")) {
+    return {
+      action: "addFaq",
+      addLabel: "Add FAQ",
+      eyebrow: "Content Management",
+      title: "FAQs",
     };
   }
 
@@ -72,6 +85,15 @@ function getPageConfig(pathname: string): {
       addLabel: "Add Journey",
       eyebrow: "Route Configuration",
       title: "Location Journeys",
+    };
+  }
+
+  if (pathname.startsWith("/admin/per-journeys")) {
+    return {
+      action: "addPerJourney",
+      addLabel: "Add Per Journey",
+      eyebrow: "Pricing Configuration",
+      title: "Per Journeys",
     };
   }
 
@@ -126,6 +148,11 @@ export function AdminTopbar() {
       return;
     }
 
+    if (page.action === "addFaq") {
+      dispatch(openCreateFaqModal());
+      return;
+    }
+
     if (page.action === "addJourney") {
       dispatch(openCreateLocationJourneyModal());
       return;
@@ -143,6 +170,11 @@ export function AdminTopbar() {
 
     if (page.action === "addRoutePricing") {
       dispatch(openCreateRoutePricingModal());
+      return;
+    }
+
+    if (page.action === "addPerJourney") {
+      dispatch(openCreatePerJourneyModal());
       return;
     }
 
@@ -185,7 +217,7 @@ export function AdminTopbar() {
         {page.action && (
           <button
             onClick={handleAdd}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525]"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a]"
           >
             <Plus className="h-4 w-4" />
             {page.addLabel}

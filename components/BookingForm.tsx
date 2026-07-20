@@ -11,7 +11,7 @@ export function BookingForm() {
   const decrementPassengers = () => setPassengers(prev => (prev > 1 ? prev - 1 : 1));
 
   return (
-    <div className="bg-white rounded-2xl p-6 md:p-8 w-full shadow-lg">
+    <div className="w-full rounded-2xl bg-white p-6 shadow-[0_18px_50px_rgba(14,24,33,0.18)] md:p-8">
       <h2 className="text-2xl md:text-3xl font-bold text-center text-transfer-dark mb-8">
         Where are you going?
       </h2>
@@ -21,7 +21,7 @@ export function BookingForm() {
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-transfer-dark">Pick up</label>
           <div className="relative">
-            <select className="w-full h-12 px-4 rounded-xl border border-gray-300 appearance-none bg-white focus:outline-none focus:border-transfer-green focus:ring-1 focus:ring-transfer-green transition-colors text-transfer-dark">
+            <select className="h-12 w-full appearance-none rounded-xl border border-transfer-green/40 bg-white px-4 text-transfer-dark transition-colors focus:border-transfer-green focus:outline-none focus:ring-1 focus:ring-transfer-green">
               <option value="hurghada">Hurghada airport</option>
               <option value="cairo">Cairo airport</option>
               <option value="sharm">Sharm El Sheikh airport</option>
@@ -38,7 +38,7 @@ export function BookingForm() {
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-transfer-dark">Drop-off</label>
           <div className="relative">
-            <select className="w-full h-12 px-4 rounded-xl border border-gray-300 appearance-none bg-white focus:outline-none focus:border-transfer-green focus:ring-1 focus:ring-transfer-green transition-colors text-transfer-dark">
+            <select className="h-12 w-full appearance-none rounded-xl border border-transfer-green/40 bg-white px-4 text-transfer-dark transition-colors focus:border-transfer-green focus:outline-none focus:ring-1 focus:ring-transfer-green">
               <option value="el-gouna">El Gouna</option>
               <option value="makadi">Makadi Bay</option>
               <option value="sahl-hasheesh">Sahl Hasheesh</option>
@@ -61,7 +61,7 @@ export function BookingForm() {
               </div>
               <input 
                 type="date" 
-                className="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-transfer-green focus:ring-1 focus:ring-transfer-green transition-colors text-transfer-dark"
+                className="h-12 w-full rounded-xl border border-transfer-green/40 bg-white pl-10 pr-4 text-transfer-dark transition-colors focus:border-transfer-green focus:outline-none focus:ring-1 focus:ring-transfer-green"
               />
             </div>
           </div>
@@ -75,7 +75,7 @@ export function BookingForm() {
               </div>
               <input 
                 type="time" 
-                className="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-transfer-green focus:ring-1 focus:ring-transfer-green transition-colors text-transfer-dark"
+                className="h-12 w-full rounded-xl border border-transfer-green/40 bg-white pl-10 pr-4 text-transfer-dark transition-colors focus:border-transfer-green focus:outline-none focus:ring-1 focus:ring-transfer-green"
               />
             </div>
           </div>
@@ -89,7 +89,7 @@ export function BookingForm() {
               <button 
                 type="button" 
                 onClick={decrementPassengers}
-                className="w-8 h-8 rounded-full bg-transfer-green text-white flex items-center justify-center hover:bg-[#3d8525] transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-transfer-green text-white transition-colors hover:bg-[#ad743a]"
                 aria-label="Decrease passengers"
               >
                 <Minus className="w-4 h-4" />
@@ -100,7 +100,7 @@ export function BookingForm() {
               <button 
                 type="button" 
                 onClick={incrementPassengers}
-                className="w-8 h-8 rounded-full bg-transfer-green text-white flex items-center justify-center hover:bg-[#3d8525] transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-transfer-green text-white transition-colors hover:bg-[#ad743a]"
                 aria-label="Increase passengers"
               >
                 <Plus className="w-4 h-4" />
@@ -112,7 +112,7 @@ export function BookingForm() {
           <div className="flex flex-col gap-2">
             <label className="text-sm font-semibold text-transfer-dark">Vehicle Type</label>
             <div className="relative">
-              <select defaultValue="select" className="w-full h-12 px-4 rounded-xl border border-gray-300 appearance-none bg-white focus:outline-none focus:border-transfer-green focus:ring-1 focus:ring-transfer-green transition-colors text-transfer-dark">
+              <select defaultValue="select" className="h-12 w-full appearance-none rounded-xl border border-transfer-green/40 bg-white px-4 text-transfer-dark transition-colors focus:border-transfer-green focus:outline-none focus:ring-1 focus:ring-transfer-green">
                 <option value="select" disabled>select</option>
                 <option value="sedan">Sedan</option>
                 <option value="suv">SUV</option>

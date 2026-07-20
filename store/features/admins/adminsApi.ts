@@ -1,5 +1,5 @@
 import { apiRequest, ApiResponse } from "@/lib/apiClient";
-import { AddAdminPayload, AdminsResponse, UpdateAdminPayload } from "./adminsModels";
+import { AddAdminPayload, AdminsResponse } from "./adminsModels";
 
 export function getAdminsRequest(pageNumber: number, pageSize: number, token: string | null) {
   return apiRequest<AdminsResponse>(
@@ -11,14 +11,6 @@ export function getAdminsRequest(pageNumber: number, pageSize: number, token: st
 export function addAdminRequest(payload: AddAdminPayload, token: string | null) {
   return apiRequest<ApiResponse<null>>("/Auth/add-admin", {
     method: "POST",
-    body: payload,
-    token,
-  });
-}
-
-export function updateAdminRequest(payload: UpdateAdminPayload, token: string | null) {
-  return apiRequest<ApiResponse<null>>("/Auth/update-admin", {
-    method: "PUT",
     body: payload,
     token,
   });

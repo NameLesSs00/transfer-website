@@ -65,7 +65,7 @@ export function UpdatePasswordForm() {
         />
         <button
           disabled={updateStatus === "loading"}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525] disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {updateStatus === "loading" ? (
             <Loader2 className="h-4 w-4 animate-spin" />

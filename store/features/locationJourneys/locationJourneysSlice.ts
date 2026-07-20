@@ -47,6 +47,12 @@ function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
+function getPositiveNumber(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0
+    ? value
+    : fallback;
+}
+
 function getQueryFromState(state: RootState, overrides: Partial<LocationJourneysQuery> = {}) {
   const current = state.locationJourneys;
 
@@ -156,12 +162,20 @@ const locationJourneysSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchLocationJourneys.fulfilled, (state, action) => {
+        const requestedQuery = action.meta.arg;
+        const pageNumber = getPositiveNumber(requestedQuery?.pageNumber, state.pageNumber);
+        const pageSize = getPositiveNumber(requestedQuery?.pageSize, state.pageSize);
+        const totalRecords = getPositiveNumber(
+          action.payload.totalRecords,
+          action.payload.data?.length ?? 0
+        );
+
         state.listStatus = "succeeded";
         state.items = action.payload.data ?? [];
-        state.pageNumber = action.payload.pageNumber || state.pageNumber;
-        state.pageSize = action.payload.pageSize || state.pageSize;
-        state.totalPages = action.payload.totalPages || 1;
-        state.totalRecords = action.payload.totalRecords || action.payload.data?.length || 0;
+        state.pageNumber = pageNumber;
+        state.pageSize = pageSize;
+        state.totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+        state.totalRecords = totalRecords;
       })
       .addCase(fetchLocationJourneys.rejected, (state, action) => {
         state.listStatus = "failed";

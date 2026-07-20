@@ -38,7 +38,7 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
       className="fixed inset-0 z-50 bg-transfer-bg flex flex-col pt-6 px-6 overflow-y-auto"
     >
       <div className="flex items-center justify-between mb-12">
-        <Image src="/Logo.png" alt="Logoipsum" width={140} height={40} className="w-[140px] h-auto" />
+        <Image src="/Logo.png" alt="Rubin Tours" width={38} height={49} className="h-12 w-auto object-contain" />
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 cursor-pointer">
             <Globe className="w-5 h-5 text-transfer-green" />

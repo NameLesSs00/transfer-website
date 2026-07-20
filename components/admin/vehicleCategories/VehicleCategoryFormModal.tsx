@@ -133,7 +133,7 @@ function VehicleCategoryFormModalContent() {
                     onClick={() => setPricingType(option.value)}
                     className={`rounded-xl border p-4 text-left transition-colors ${
                       isSelected
-                        ? "border-transfer-green bg-[#edf8f1] text-transfer-dark"
+                        ? "border-transfer-green bg-[#fbf5f0] text-transfer-dark"
                         : "border-gray-200 bg-white text-[#667085] hover:bg-gray-50"
                     }`}
                   >
@@ -149,7 +149,7 @@ function VehicleCategoryFormModalContent() {
 
           <button
             disabled={isSubmitting || !canSubmit}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />

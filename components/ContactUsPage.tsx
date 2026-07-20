@@ -66,7 +66,7 @@ export function ContactUsPage() {
             
             {/* Location */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-transfer-light-green">
                 <MapPin className="w-6 h-6 text-transfer-green" />
               </div>
               <div className="flex flex-col gap-1">
@@ -77,7 +77,7 @@ export function ContactUsPage() {
 
             {/* Call Us */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-transfer-light-green">
                 <Phone className="w-6 h-6 text-transfer-green" />
               </div>
               <div className="flex flex-col gap-1">
@@ -88,7 +88,7 @@ export function ContactUsPage() {
 
             {/* Email */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-transfer-light-green">
                 <Mail className="w-6 h-6 text-transfer-green" />
               </div>
               <div className="flex flex-col gap-1">
@@ -99,7 +99,7 @@ export function ContactUsPage() {
 
             {/* Working Hours */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-transfer-light-green">
                 <Clock className="w-6 h-6 text-transfer-green" />
               </div>
               <div className="flex flex-col gap-1">

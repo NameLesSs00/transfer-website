@@ -46,9 +46,9 @@ export function RoutePricingsTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-x-auto">
         <table className="w-full min-w-[1040px] text-left">
-          <thead className="bg-[#f8fafb] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
+          <thead className="bg-[#fbfaf8] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
             <tr>
               <th className="px-5 py-4">Vehicle Category</th>
               <th className="px-5 py-4">Route</th>
@@ -88,7 +88,7 @@ export function RoutePricingsTable() {
                   <tr key={pricing.id} className="text-sm font-medium text-transfer-dark">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#edf8f1] text-transfer-green">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf5f0] text-transfer-green">
                           <Tags className="h-5 w-5" />
                         </span>
                         <span className="font-bold">{categoryName}</span>
@@ -96,7 +96,7 @@ export function RoutePricingsTable() {
                     </td>
                     <td className="max-w-[360px] px-5 py-4">
                       <div className="flex items-start gap-3">
-                        <span className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#edf8f1] text-transfer-green">
+                        <span className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#fbf5f0] text-transfer-green">
                           <Route className="h-4 w-4" />
                         </span>
                         <div className="min-w-0">
@@ -110,7 +110,7 @@ export function RoutePricingsTable() {
                       </div>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-2 rounded-full bg-[#f6f8fb] px-3 py-1 text-sm font-bold text-transfer-dark">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-[#fbfaf8] px-3 py-1 text-sm font-bold text-transfer-dark">
                         <BadgeDollarSign className="h-4 w-4 text-transfer-green" />
                         {formatPrice(pricing.price)}
                       </span>
@@ -119,7 +119,7 @@ export function RoutePricingsTable() {
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
                           pricing.isActive
-                            ? "bg-[#edf8f1] text-transfer-green"
+                            ? "bg-[#fbf5f0] text-transfer-green"
                             : "bg-gray-100 text-[#667085]"
                         }`}
                       >

@@ -88,7 +88,7 @@ export function AboutUsPage() {
           >
             <div className="flex flex-col gap-2">
               <h2 className="text-3xl md:text-4xl font-bold text-transfer-dark">Our Story</h2>
-              <div className="w-24 h-[4px] bg-[#ddf0d6] rounded-full" />
+              <div className="h-[4px] w-24 rounded-full bg-transfer-light-green" />
             </div>
             <p className="text-base md:text-lg text-transfer-gray leading-relaxed">
               We are dedicated to providing safe, reliable, and comfortable airport transfer services across the Red Sea region. Whether you&apos;re arriving for a relaxing vacation or heading back to the airport, our goal is to make every journey smooth and stress-free.
@@ -126,14 +126,14 @@ export function AboutUsPage() {
         <div className="flex flex-col md:flex-row gap-6 md:gap-10">
           
           <motion.div 
-            className="flex-1 bg-[#f4fbf2] rounded-3xl p-8 md:p-10 flex flex-col gap-6"
+            className="flex flex-1 flex-col gap-6 rounded-3xl bg-transfer-light-green p-8 md:p-10"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white">
                 <Target className="w-7 h-7 text-transfer-green" />
               </div>
               <h3 className="text-2xl font-bold text-transfer-dark">Our Mission</h3>
@@ -144,14 +144,14 @@ export function AboutUsPage() {
           </motion.div>
 
           <motion.div 
-            className="flex-1 bg-[#f4fbf2] rounded-3xl p-8 md:p-10 flex flex-col gap-6"
+            className="flex flex-1 flex-col gap-6 rounded-3xl bg-transfer-light-green p-8 md:p-10"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white">
                 <Eye className="w-7 h-7 text-transfer-green" />
               </div>
               <h3 className="text-2xl font-bold text-transfer-dark">Our Vision</h3>
@@ -174,7 +174,7 @@ export function AboutUsPage() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-transfer-dark">Why Choose us ?</h2>
-          <div className="w-24 h-[4px] bg-[#ddf0d6] rounded-full" />
+          <div className="h-[4px] w-24 rounded-full bg-transfer-light-green" />
         </motion.div>
 
         {/* Grid of 5 items */}
@@ -217,7 +217,7 @@ export function AboutUsPage() {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="w-12 h-12 rounded-full bg-[#ddf0d6] flex items-center justify-center flex-shrink-0">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-transfer-light-green">
                   <Icon className="w-6 h-6 text-transfer-green" />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -270,7 +270,7 @@ export function AboutUsPage() {
           </div>
 
           <div className="relative z-20 flex-shrink-0">
-            <Button href="/billing" className="px-5 py-4 md:px-8 md:py-6 text-sm md:text-lg">
+            <Button href="/billing" className="bg-[rgba(196,135,70,1)] px-5 py-4 text-sm hover:bg-[#ad743a] md:px-8 md:py-6 md:text-lg">
               Book Transfer
             </Button>
           </div>

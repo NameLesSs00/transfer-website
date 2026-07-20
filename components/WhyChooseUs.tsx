@@ -38,7 +38,7 @@ export function WhyChooseUs() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-transfer-green">Why choose us?</h2>
-          <div className="w-32 h-1.5 bg-transfer-light-green rounded-full"></div>
+          <div className="h-1.5 w-32 rounded-full bg-transfer-light-green"></div>
         </motion.div>
 
         {/* Content Section */}
@@ -73,7 +73,7 @@ export function WhyChooseUs() {
             {/* Card 1: 24/7 service */}
             <motion.div 
               variants={itemVariants}
-              className="bg-transfer-light-green rounded-[24px] p-6 md:p-8 flex flex-col items-center justify-center text-center gap-4 aspect-square shadow-sm"
+              className="flex aspect-square flex-col items-center justify-center gap-4 rounded-[18px] bg-transfer-light-green p-6 text-center shadow-sm md:p-8"
             >
               <History className="w-12 h-12 md:w-16 md:h-16 text-transfer-green stroke-[1.5]" />
               <h3 className="text-lg md:text-xl font-medium text-transfer-green">24/7 service</h3>
@@ -82,7 +82,7 @@ export function WhyChooseUs() {
             {/* Card 2: Professional Drivers */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border-2 border-transfer-green rounded-[24px] p-6 md:p-8 flex flex-col items-center justify-center text-center gap-4 aspect-square shadow-sm"
+              className="flex aspect-square flex-col items-center justify-center gap-4 rounded-[18px] border-2 border-transfer-green bg-white p-6 text-center shadow-sm md:p-8"
             >
               <div className="relative w-12 h-12 md:w-16 md:h-16">
                 <Image 
@@ -98,7 +98,7 @@ export function WhyChooseUs() {
             {/* Card 3: Free Cancellation */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border-2 border-transfer-green rounded-[24px] p-6 md:p-8 flex flex-col items-center justify-center text-center gap-4 aspect-square shadow-sm"
+              className="flex aspect-square flex-col items-center justify-center gap-4 rounded-[18px] border-2 border-transfer-green bg-white p-6 text-center shadow-sm md:p-8"
             >
               <Ban className="w-12 h-12 md:w-16 md:h-16 text-transfer-green stroke-[1.5]" />
               <h3 className="text-lg md:text-xl font-medium text-transfer-green">Free Cancellation</h3>
@@ -107,7 +107,7 @@ export function WhyChooseUs() {
             {/* Card 4: Fixed Prices */}
             <motion.div 
               variants={itemVariants}
-              className="bg-transfer-light-green rounded-[24px] p-6 md:p-8 flex flex-col items-center justify-center text-center gap-4 aspect-square shadow-sm"
+              className="flex aspect-square flex-col items-center justify-center gap-4 rounded-[18px] bg-transfer-light-green p-6 text-center shadow-sm md:p-8"
             >
               <div className="relative w-12 h-12 md:w-16 md:h-16">
                 <Image 

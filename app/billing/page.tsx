@@ -117,7 +117,7 @@ function BookingSummary() {
           />
         </div>
 
-        <span className="mt-4 inline-flex rounded bg-[#e9f7ed] px-3 py-1 text-xs font-bold text-transfer-green">
+        <span className="mt-4 inline-flex rounded bg-transfer-light-green px-3 py-1 text-xs font-bold text-transfer-green">
           Private Limousine
         </span>
 
@@ -157,7 +157,7 @@ function BookingSummary() {
           <span className="text-lg font-bold text-transfer-dark">Total</span>
           <strong className="text-3xl font-bold text-transfer-green">$20.00</strong>
         </div>
-        <div className="mt-5 flex items-start gap-3 rounded-lg bg-[#edf8f1] p-4 text-transfer-green">
+        <div className="mt-5 flex items-start gap-3 rounded-lg bg-transfer-light-green p-4 text-transfer-green">
           <BadgeCheck className="mt-0.5 h-5 w-5 flex-shrink-0" />
           <div>
             <p className="text-sm font-bold">No Hidden Charges</p>
@@ -204,9 +204,9 @@ function TransferDetails() {
   const isArrival = transferType === "arrival";
 
   const selectedTransferClass =
-    "border-transfer-green bg-[#edf8f1] text-transfer-green";
+    "border-transfer-green bg-transfer-light-green text-transfer-green";
   const unselectedTransferClass =
-    "border-gray-200 bg-white text-[#667085] hover:border-transfer-green/60 hover:bg-[#f8fcf9]";
+    "border-gray-200 bg-white text-[#667085] hover:border-transfer-green/60 hover:bg-transfer-light-green";
 
   return (
     <Section icon={<Car className="h-6 w-6" />} title="Transfer Details">
@@ -297,7 +297,7 @@ function PaymentMethod() {
     <Section icon={<CreditCard className="h-6 w-6" />} title="Payment Method">
       <div className="flex flex-col gap-5">
         <div className="grid gap-3">
-          <label className="flex min-h-[72px] cursor-pointer items-center justify-between gap-4 rounded-lg border border-transfer-green bg-[#f2faf4] px-4 py-3">
+          <label className="flex min-h-[72px] cursor-pointer items-center justify-between gap-4 rounded-lg border border-transfer-green bg-transfer-light-green px-4 py-3">
             <span className="flex items-center gap-4">
               <span className="flex h-5 w-5 items-center justify-center rounded-full border-[6px] border-transfer-green" />
               <span>
@@ -342,7 +342,7 @@ function PaymentMethod() {
           </Field>
         </div>
 
-        <div className="flex items-start gap-4 rounded-lg bg-[#edf8f1] p-4">
+        <div className="flex items-start gap-4 rounded-lg bg-transfer-light-green p-4">
           <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 fill-transfer-green text-transfer-green" />
           <div>
             <p className="font-bold text-transfer-dark">Your payment is secure and encrypted</p>
@@ -370,7 +370,7 @@ function PaymentMethod() {
           </span>
         </label>
 
-        <button className="flex min-h-[68px] w-full flex-col items-center justify-center rounded-lg bg-transfer-green px-6 py-4 text-center font-bold text-white transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]">
+        <button className="flex min-h-[68px] w-full flex-col items-center justify-center rounded-lg bg-transfer-dark px-6 py-4 text-center font-bold text-white transition-transform duration-200 hover:scale-[1.01] hover:bg-[#182634] active:scale-[0.99]">
           <span className="inline-flex items-center gap-3 text-lg">
             <Lock className="h-5 w-5" />
             Pay Now & Confirm Booking

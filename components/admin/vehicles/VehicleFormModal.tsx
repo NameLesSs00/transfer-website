@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
-import { CarFront, Loader2, Save } from "lucide-react";
+import { CarFront, ImageIcon, Loader2, Save, Upload } from "lucide-react";
 import {
   closeVehicleModal,
   createVehicle,
@@ -50,9 +50,9 @@ function VehicleFormModalContent() {
   const [form, setForm] = useState<VehicleFormState>({
     name: selectedVehicle?.name ?? "",
     model: selectedVehicle?.model ?? "",
-    year: selectedVehicle?.year ? String(selectedVehicle.year) : "",
+    year: selectedVehicle?.year != null ? String(selectedVehicle.year) : "",
     licensePlate: selectedVehicle?.licensePlate ?? "",
-    capacity: selectedVehicle?.capacity ? String(selectedVehicle.capacity) : "",
+    capacity: selectedVehicle?.capacity != null ? String(selectedVehicle.capacity) : "",
     imageUrl: selectedVehicle?.imageUrl ?? "",
     isActive: selectedVehicle?.isActive ?? true,
     vehicleCategoryId: selectedVehicle?.vehicleCategoryId ? String(selectedVehicle.vehicleCategoryId) : "",
@@ -71,6 +71,9 @@ function VehicleFormModalContent() {
     Boolean(form.vehicleCategoryId) &&
     Boolean(form.vehicleFactoryId) &&
     (isEditing || Boolean(imageFile));
+  const fieldClass =
+    "h-11 rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium text-transfer-dark outline-none transition focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15";
+  const labelClass = "text-sm font-semibold text-transfer-dark";
 
   function updateField<Key extends keyof VehicleFormState>(
     key: Key,
@@ -100,7 +103,7 @@ function VehicleFormModalContent() {
       year,
       licensePlate: form.licensePlate.trim(),
       capacity,
-      isActive: form.isActive,
+      isActive: isEditing ? form.isActive : true,
       vehicleCategoryId,
       vehicleFactoryId,
     };
@@ -110,7 +113,7 @@ function VehicleFormModalContent() {
         ? await dispatch(
             updateVehicle({
               id: selectedVehicle.id,
-              imageUrl: form.imageUrl,
+              imageFile,
               ...basePayload,
             })
           )
@@ -128,8 +131,8 @@ function VehicleFormModalContent() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/35 px-4 py-6">
-      <section className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-[0_18px_70px_rgba(15,23,42,0.18)]">
-        <div className="flex items-start justify-between gap-4">
+      <section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-[0_18px_70px_rgba(15,23,42,0.18)]">
+        <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-5">
           <div>
             <h2 className="text-xl font-bold text-transfer-dark">
               {isEditing ? "Edit Vehicle" : "Add Vehicle"}
@@ -146,83 +149,86 @@ function VehicleFormModalContent() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="grid gap-4 px-6 py-5 md:grid-cols-2">
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Name</span>
+            <span className={labelClass}>Name</span>
             <input
               value={form.name}
               onChange={(event) => updateField("name", event.target.value)}
               placeholder="Mercedes V Class"
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             />
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Model</span>
+            <span className={labelClass}>Model</span>
             <input
               value={form.model}
               onChange={(event) => updateField("model", event.target.value)}
               placeholder="V250"
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             />
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Year</span>
+            <span className={labelClass}>Year</span>
             <input
               type="number"
               value={form.year}
               onChange={(event) => updateField("year", event.target.value)}
               min={1900}
               max={2100}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             />
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Capacity</span>
+            <span className={labelClass}>Capacity</span>
             <input
               type="number"
               value={form.capacity}
               onChange={(event) => updateField("capacity", event.target.value)}
               min={1}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             />
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">License Plate</span>
+            <span className={labelClass}>License Plate</span>
             <input
               value={form.licensePlate}
               onChange={(event) => updateField("licensePlate", event.target.value)}
               placeholder="A-B-C-1234"
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             />
           </label>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Status</span>
-            <select
-              value={form.isActive ? "true" : "false"}
-              onChange={(event) => updateField("isActive", event.target.value === "true")}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
-            >
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-          </label>
+          {isEditing && (
+            <label className="flex flex-col gap-2">
+              <span className={labelClass}>Status</span>
+              <span className="flex h-11 items-center justify-between rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-transfer-dark">
+                Active
+                <input
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(event) => updateField("isActive", event.target.checked)}
+                  className="h-4 w-4 accent-transfer-green"
+                />
+              </span>
+            </label>
+          )}
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Vehicle Category</span>
+            <span className={labelClass}>Vehicle Category</span>
             <select
               value={form.vehicleCategoryId}
               onChange={(event) => updateField("vehicleCategoryId", event.target.value)}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             >
               <option value="">Select category</option>
@@ -235,11 +241,11 @@ function VehicleFormModalContent() {
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-transfer-dark">Vehicle Factory</span>
+            <span className={labelClass}>Vehicle Factory</span>
             <select
               value={form.vehicleFactoryId}
               onChange={(event) => updateField("vehicleFactoryId", event.target.value)}
-              className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
+              className={fieldClass}
               required
             >
               <option value="">Select factory</option>
@@ -251,42 +257,49 @@ function VehicleFormModalContent() {
             </select>
           </label>
 
-          {isEditing && (
-            <label className="flex flex-col gap-2 md:col-span-2">
-              <span className="text-sm font-semibold text-transfer-dark">Image URL</span>
-              <input
-                value={form.imageUrl}
-                onChange={(event) => updateField("imageUrl", event.target.value)}
-                className="h-11 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-transfer-green focus:ring-2 focus:ring-transfer-green/15"
-                required
-              />
-            </label>
-          )}
-
           <label className="flex flex-col gap-2 md:col-span-2">
-            <span className="text-sm font-semibold text-transfer-dark">
-              {isEditing ? "Replace Image Preview" : "Vehicle Image"}
+            <span className={labelClass}>
+              {isEditing ? "Replace Vehicle Image" : "Vehicle Image"}
             </span>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-[#edf8f1] file:px-3 file:py-2 file:text-sm file:font-bold file:text-transfer-green"
-              required={!isEditing}
-            />
+            <span className="flex min-h-14 flex-col gap-3 rounded-lg border border-dashed border-gray-200 bg-[#fbfaf8] p-3 sm:flex-row sm:items-center sm:justify-between">
+              <span className="flex min-w-0 items-center gap-3 text-sm font-medium text-[#667085]">
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white text-transfer-green">
+                  <ImageIcon className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 truncate">
+                  {imageFile?.name || (isEditing ? "Keep current image or upload a replacement" : "Choose an image to upload")}
+                </span>
+              </span>
+              <span className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a]">
+                <Upload className="h-4 w-4" />
+                Choose Image
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="sr-only"
+                required={!isEditing}
+              />
+            </span>
           </label>
 
           {imagePreviewUrl && (
-            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-[#f8fafb] p-3 md:col-span-2">
+            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-[#fbfaf8] p-4 md:col-span-2 sm:flex-row sm:items-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imagePreviewUrl}
                 alt="Vehicle preview"
-                className="h-20 w-28 rounded-lg object-cover"
+                className="h-24 w-32 rounded-lg border border-gray-100 bg-white object-contain p-2"
               />
-              <p className="text-sm font-medium text-[#667085]">
-                {imageFile ? imageFile.name : "Current vehicle image"}
-              </p>
+              <div>
+                <p className="text-sm font-bold text-transfer-dark">
+                  {imageFile ? "Selected replacement image" : "Current vehicle image"}
+                </p>
+                <p className="mt-1 text-sm font-medium leading-6 text-[#667085]">
+                  {imageFile ? imageFile.name : "This image will be kept if no replacement is chosen."}
+                </p>
+              </div>
             </div>
           )}
 
@@ -298,7 +311,7 @@ function VehicleFormModalContent() {
 
           <button
             disabled={isSubmitting || !canSubmit}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#3d8525] disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-transfer-green px-4 text-sm font-bold text-white hover:bg-[#ad743a] disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2"
           >
             {isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />

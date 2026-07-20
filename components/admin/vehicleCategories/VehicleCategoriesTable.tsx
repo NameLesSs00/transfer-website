@@ -37,9 +37,9 @@ export function VehicleCategoriesTable() {
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="flex-1 overflow-x-auto">
         <table className="w-full min-w-[840px] text-left">
-          <thead className="bg-[#f8fafb] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
+          <thead className="bg-[#fbfaf8] text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">
             <tr>
               <th className="px-5 py-4">Category</th>
               <th className="px-5 py-4">Description</th>
@@ -67,7 +67,7 @@ export function VehicleCategoriesTable() {
                 <tr key={category.id} className="text-sm font-medium text-transfer-dark">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#edf8f1] font-bold text-transfer-green">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fbf5f0] font-bold text-transfer-green">
                         <Tags className="h-5 w-5" />
                       </span>
                       <span className="font-bold">{category.name}</span>
@@ -77,7 +77,7 @@ export function VehicleCategoriesTable() {
                     <span className="line-clamp-2">{category.description || "No description"}</span>
                   </td>
                   <td className="px-5 py-4">
-                    <span className="inline-flex rounded-full bg-[#edf8f1] px-3 py-1 text-xs font-bold text-transfer-green">
+                    <span className="inline-flex rounded-full bg-[#fbf5f0] px-3 py-1 text-xs font-bold text-transfer-green">
                       {getPricingTypeLabel(category.pricingType)}
                     </span>
                   </td>
@@ -85,7 +85,7 @@ export function VehicleCategoriesTable() {
                     <span
                       className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
                         category.isActive
-                          ? "bg-[#edf8f1] text-transfer-green"
+                          ? "bg-[#fbf5f0] text-transfer-green"
                           : "bg-gray-100 text-[#667085]"
                       }`}
                     >
