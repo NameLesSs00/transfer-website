@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeDollarSign, CarFront, ClipboardList, Factory, HelpCircle, LayoutDashboard, MapPin, MapPinned, Route, Tags, Users, X } from "lucide-react";
+import { BadgeDollarSign, BarChart3, CarFront, ClipboardList, Factory, HelpCircle, LayoutDashboard, MapPin, MapPinned, Route, Tags, Users, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeAdminSidebar } from "@/store/features/ui/uiSlice";
@@ -12,6 +12,11 @@ const navigationItems = [
     href: "/admin/dashboard",
     icon: LayoutDashboard,
     label: "Dashboard",
+  },
+  {
+    href: "/admin/reports",
+    icon: BarChart3,
+    label: "Reports",
   },
   {
     href: "/admin/admins",
