@@ -135,7 +135,7 @@ function OurCitiesContent() {
         {/* BG image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/ourCities/ourCitiesBg.png"
+            src="/ourCities/ourCitiesBG.png"
             alt="Our Cities"
             fill
             draggable={false}
